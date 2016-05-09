@@ -1,2 +1,2 @@
 # TestScript
-Test Automation Script
+Test Automation Scripts
