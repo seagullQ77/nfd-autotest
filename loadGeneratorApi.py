@@ -2,6 +2,7 @@
 import requests
 import random
 from faker import Factory
+import provinceChoice
 urlTest= "https://ot.nongfadai.com"#1
 urlDev="http://omegadev.nongfadai.com"#2
 urlInt="https://omegaint.nongfadai.com"#3
@@ -10,8 +11,8 @@ fake=Factory.create('zh_CN')
 mobile=fake.phone_number()
 idCard=fake.ssn()
 address=fake.address()
-provinceId=44
-cityId=4403
+provinceId=provinceChoice.pcList()[0]
+cityId=provinceChoice.pcList()[1]
 name=fake.name()
 id=-1
 timelimit=random.randrange(1,25)
@@ -27,8 +28,6 @@ payloadLoadStep3Profile={'mobile':mobile,
                          'address':address,
                          'name':name
                         }
-
-
 
 #定义企业借款函数
 def corporateLoan():
@@ -84,13 +83,14 @@ def personalLoan():
 
 
 if __name__ == '__main__':
-    env=input("环境？1测试，2开发，3体验，4预发布")
-    url=[urlTest,urlDev,urlInt,urlPre][env-1]
-    loadType=input("借款主体？1个人，2企业")
+ #    env=input("环境？1测试，2开发，3体验，4预发布")
+ #    url=[urlTest,urlDev,urlInt,urlPre][env-1]
+ #    loadType=input("借款主体？1个人，2企业")
+    url=urlTest
     s = requests.session()
     r1 = s.post(url+'/mp_server/loan/loginRegister', data=payloadLoginRegister)
     r2 = s.post(url+'/mp_server/loan/loanStep3Profile', data=payloadLoadStep3Profile)
-    if loadType==2:
-        corporateLoan()
-    else:
-        personalLoan()
+    #if loadType==2:
+    #corporateLoan()
+    #else:
+    personalLoan()
