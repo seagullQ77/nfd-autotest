@@ -648,7 +648,7 @@ class Provider(AddressProvider):
     @classmethod
     def province_city_id(cls):
         list_province=cls.random_element(cls.provice_city_list)
-        province_id=list_province['id']
-        city_id=cls.random_element(list_province['cities'])['id']
+        province_id=list_province[id]
+        city_id=cls.random_element(list_province['cities'])[id]
         return [province_id,city_id]
         
