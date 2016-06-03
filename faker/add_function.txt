@@ -1,0 +1,18 @@
+company:
+        corporate_code() #生成随机的营业执照号
+		organization_code() #生成企业的9位组织机构代码(如:0B2O4794-7),有正确计算校验位,可以通过组织机构代码校验
+credit_card:
+            credit_card_number() #支持生成中国大陆银行的银行卡号		
+date_time:
+           date_today_next() #生成一个当天以后的日期(不包括当天,返回的日期格式:YYYY-MM-DD)
+lorem:
+		新增中文支持，并添加一些方法
+		crops() #随机生成一种农作物名称
+person：
+       person_id() #随机生成一个大陆的省份证号,可通过身份证基础规则校验
+	   name_wuxia() #随机生成一个武侠小说中的人名
+		
+示例:	
+from faker.factory import Factory
+myfaker = Factory.create(locale='zh_CN')
+card_number = myfaker.credit_card_number()
