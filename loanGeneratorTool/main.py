@@ -2,7 +2,7 @@
 from Tkinter import *
 
 import standardGeneratorApi
-from loanGeneratorTool import cropGeneratorApi
+import cropGeneratorApi
 
 
 def loanGui():
@@ -22,10 +22,10 @@ def loanGui():
     R4 = Radiobutton(top, text="预发布", variable=env, value=4)
     R4.grid(row = 0,column =4)
 
-    lSpace=Label(top,text='-------------普通贷生成区，下面各项必填，约3~5秒生成一条-------------',fg='blue')
+    lSpace=Label(top,text='-------------普通贷生成区 ，约3~5秒生成一条-------------',fg='blue')
     lSpace.grid(row=1,column=0,columnspan=8,sticky=W)
 
-    l2 = Label(top, text='普通贷借款主体：')
+    l2 = Label(top, text='借款主体(必选）：')
     l2.grid(row=2,column=0,sticky=W)
     loanType=IntVar()
     R5 = Radiobutton(top, text="个人", variable=loanType, value=1)
@@ -33,7 +33,7 @@ def loanGui():
     R6 = Radiobutton(top, text="企业", variable=loanType, value=2)
     R6.grid(row=2,column =2)
 
-    l3 = Label(top, text='贷款条数：')
+    l3 = Label(top, text='贷款条数（默认1条）：')
     l3.grid(row=3,column=0,sticky=W)
 
     e1=Entry(top)

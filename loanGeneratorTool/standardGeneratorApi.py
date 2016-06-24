@@ -22,7 +22,7 @@ def loanGenerate(env=1,loanType=1):#1测试2联调3体验4预发布；1个人2�
     cityId= provinceChoice.pcList()[1]
     name=fake.name()
     timelimit=random.randrange(1,25)#贷款期限
-    amount=random.randrange(1,350)#贷款金额
+    amount=random.randrange(1,10)#贷款金额
     payloadLoginRegister={'mobile':mobile,
                               'smsCode':"159603",
                               'actype':""
@@ -68,7 +68,7 @@ def loanGenerate(env=1,loanType=1):#1测试2联调3体验4预发布；1个人2�
         r4=s.post(url+'/mp_server/loan/loanStep4Amount', data=payloadLoanStep4Amount).content
 
         if "贷款申请成功" in r4:
-            print "名称：",corporateName,"id：",id,"联系人：",mobile,"总额：",amount,"万","期限：",timelimit,"个月的贷款申请成功"
+            return "名称：",corporateName,"id：",id,"联系人：",mobile,"总额：",amount,"万","期限：",timelimit,"个月的贷款申请成功"
         else:
             print r4
 
