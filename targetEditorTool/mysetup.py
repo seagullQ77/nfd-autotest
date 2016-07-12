@@ -1,3 +1,3 @@
 from distutils.core import setup
 import py2exe
-setup(console=["targetEditor.py"])
+setup(console=["F:\\pyTestA\\TestScript\\targetEditorTool\\targetEditor.py"])

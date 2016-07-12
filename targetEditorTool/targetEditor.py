@@ -4,7 +4,7 @@ import datetime
 import time
 fullTime=time.strftime("%Y-%m-%d %X",time.localtime())
 p2pValueDate=datetime.date.today()
-targetCode=input('（测试环境）输入要修改的标的编号：')
+targetCode=input('输入要修改的标的编号：')
 a=targetCode
 targetTitle='种植贷'+str(a)
 try:
@@ -14,7 +14,6 @@ try:
     cur.execute('select target_status from withdrawal_split_target WHERE target_code=%s'%targetCode)
     result=None
     result = cur.fetchone()
-    print result
     if result==('DFB',):
         cur.execute("update withdrawal_split_target set target_status='DFK',target_title='%s',target_p2p_value_date='%s',target_full_time='%s' WHERE target_code=%s"%(targetTitle,p2pValueDate,fullTime,targetCode))
         print '编辑成功!','标的:%s'%targetCode,'p2p起息日：%s'%p2pValueDate,"p2p满标时间:%s"%fullTime
