@@ -1,7 +1,14 @@
-# -*- coding: utf-8 -*-
+# -*- coding:utf-8 -*-
 import MySQLdb
 import datetime
 import time
+import win32clipboard as w
+import win32con
+def getText():
+    w.OpenClipboard()
+    d = w.GetClipboardData(win32con.CF_TEXT)
+    w.CloseClipboard()
+    return d
 fullTime=time.strftime("%Y-%m-%d %X",time.localtime())
 p2pValueDate=datetime.date.today()
 targetCode=input('输入要修改的标的编号：')
@@ -26,3 +33,4 @@ try:
 except MySQLdb.Error, e:
     print '修改失败！'
     print "Mysql Error %d: %s" % (e.args[0], e.args[1])
+print '任意键退出！'
