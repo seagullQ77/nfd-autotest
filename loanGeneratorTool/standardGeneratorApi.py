@@ -1,13 +1,9 @@
 # -*- coding: utf-8 -*-
 #产生普通贷
 import random
-
 import requests
 from faker import Factory
-
 import provinceChoice
-
-
 def loanGenerate(env=1,loanType=1):#1测试2联调3体验4预发布；1个人2企业
     urlTest= "https://ot.nongfadai.com"#1
     urlDev="https://omegadev.nongfadai.com"#2
@@ -18,8 +14,7 @@ def loanGenerate(env=1,loanType=1):#1测试2联调3体验4预发布；1个人2�
     mobile=fake.phone_number()#注册手机
     idCard=fake.ssn()#身份证
     address=fake.address()
-    provinceId= provinceChoice.pcList()[0]
-    cityId= provinceChoice.pcList()[1]
+    [provinceId,cityId]= provinceChoice.pcList()
     name=fake.name()
     timelimit=random.randrange(1,25)#贷款期限
     amount=random.randrange(1,10)#贷款金额

@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
 from Tkinter import *
-
 import standardGeneratorApi
 import cropGeneratorApi
-
-
 def loanGui():
     top = Tk()
     top.title('贷款生成器V1.0 by 质量管理部')

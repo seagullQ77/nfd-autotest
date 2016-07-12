@@ -1,13 +1,9 @@
 # -*- coding: utf-8 -*-
 #产生富农贷
 import random
-
 import requests
 from faker import Factory
-
 import provinceChoice
-
-
 def loanGenerate(GuarantorId,env,education=1,isMarried=1,contactType=1):#1测试2联调3体验4预发布；1~3,高中，大专，大学；1-5，老婆，子女，父母，朋友，其他
     urlTest= "https://ot.nongfadai.com"#1
     urlDev="https://omegadev.nongfadai.com"#2
@@ -20,8 +16,7 @@ def loanGenerate(GuarantorId,env,education=1,isMarried=1,contactType=1):#1测试
     idCard=fake.ssn()
     contactIdCardNo=fake.ssn()
     address=fake.address()
-    provinceId= provinceChoice.pcList()[0]
-    cityId= provinceChoice.pcList()[1]
+    [provinceId,cityId]= provinceChoice.pcList()
     name=fake.name()
     contactName=fake.name()
     loanPeriod=random.randrange(1,25)
