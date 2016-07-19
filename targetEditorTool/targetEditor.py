@@ -25,7 +25,6 @@ try:
         cur.execute("update withdrawal_split_target set target_status='DFK',target_title='%s',target_p2p_value_date='%s',target_full_time='%s' WHERE target_code='%s'"%(targetTitle,p2pValueDate,fullTime,targetCode))
         conn.commit()
         print 'target status has been changed as DFK! Wait for FKCG now, count down！'
-        print result
         while result !='HKZ':
             result=None
             cur.execute("select target_status from withdrawal_split_target WHERE target_title='%s'" % targetTitle)
