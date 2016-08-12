@@ -14,7 +14,7 @@ def loanGenerate(env=1,loanType=1):#1测试2联调3体验4预发布；1个人2�
     mobile=fake.phone_number()#注册手机
     idCard=fake.ssn()#身份证
     address=fake.address()
-    [provinceId,cityId]= provinceChoice.pcList()
+    [provinceId,cityId,countyId]= provinceChoice.pcList()
     name=fake.name()
     timelimit=random.randrange(1,25)#贷款期限
     amount=random.randrange(1,10)#贷款金额
@@ -26,6 +26,7 @@ def loanGenerate(env=1,loanType=1):#1测试2联调3体验4预发布；1个人2�
                                  'idCard':idCard,
                                  'provinceId':provinceId,
                                  'cityId':cityId,
+                                 'countyId':countyId,
                                  'address':address,
                                  'name':name
                                 }
@@ -49,6 +50,7 @@ def loanGenerate(env=1,loanType=1):#1测试2联调3体验4预发布；1个人2�
                                    'corporateContactName':name,
                                    'provinceId':provinceId,
                                    'cityId':cityId,
+                                   'countyId':countyId,
                                    'address':address
                                    }
         r3=s.post(url+'/mp_server/loan/loanStep3Corporate', data=payloadLoanStep3Corporate)

@@ -577,4 +577,5 @@ def pcList():
  listProvince=random.choice(data)
  provinceId=listProvince[id]
  cityId=random.choice(listProvince['cities'])[id]
- return [provinceId,cityId]
+ countyId=cityId*100+01
+ return [provinceId,cityId,countyId]

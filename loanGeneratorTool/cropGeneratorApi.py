@@ -11,16 +11,18 @@ def loanGenerate(GuarantorId,env,education=1,isMarried=1,contactType=1):#1测试
     urlPre="https://omegapre.nongfadai.com"#4
     url = (urlTest, urlDev, urlInt, urlPre)[env - 1]
     fake=Factory.create('zh_CN')
-    mobile=fake.phone_number()
+    mobile=fake.phone_number()#手机号码
+    #mobile=15252859069
     contactMobilePhone=fake.phone_number()
     idCard=fake.ssn()
     contactIdCardNo=fake.ssn()
     address=fake.address()
-    [provinceId,cityId]= provinceChoice.pcList()
+    [provinceId,cityId,countyId]= provinceChoice.pcList()
     name=fake.name()
     contactName=fake.name()
     loanPeriod=random.randrange(1,25)
     loanLimit=random.randrange(1,2000001)
+    #loanLimit = 50000#贷款额度
     cardNo=fake.credit_card_number()
     payloadLoginRegister={'mobile':mobile,
                           'smsCode':"159603",
@@ -30,6 +32,7 @@ def loanGenerate(GuarantorId,env,education=1,isMarried=1,contactType=1):#1测试
                              'idCard':idCard,
                              'provinceId':provinceId,
                              'cityId':cityId,
+                             'countyId':countyId,
                              'address':address,
                              'name':name
                             }
