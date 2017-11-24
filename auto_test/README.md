@@ -1,3 +1,6 @@
+# 说明 
+脚本使用python3编写,需要安装python3.
+
 # 执行入口:
 执行main目录下的main.py
 
