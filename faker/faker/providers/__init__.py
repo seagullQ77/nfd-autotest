@@ -88,6 +88,11 @@ class BaseProvider(object):
     def random_letter(cls):
         """Returns a random letter (between a-z and A-Z)."""
         return random.choice(getattr(string, 'letters', string.ascii_letters))
+    
+    @classmethod
+    def random_str(cls,length=8):
+        """Returns a random string"""
+        return ''.join([(string.ascii_letters+string.digits)[x] for x in random.sample(range(0,62),length)]) 
 
     @classmethod
     def random_element(cls, elements=('a', 'b', 'b')):

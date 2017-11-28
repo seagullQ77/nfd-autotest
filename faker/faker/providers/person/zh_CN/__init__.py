@@ -634,7 +634,7 @@ class Provider(PersonProvider):
     @classmethod
     def person_id(cls):
         id =  cls.random_element(cls.districtcode)
-        id = id + str(cls.random_int(1950,2010))  
+        id = id + str(cls.random_int(1950,1997))  
         da = date.today()+timedelta(days=cls.random_int(1,366)) #月份和日期项 
         id = id + da.strftime('%m%d') 
         id = id+ str(cls.random_int(100,999))#，顺序号简单处理 
