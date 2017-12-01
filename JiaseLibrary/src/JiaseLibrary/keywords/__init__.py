@@ -5,7 +5,7 @@ from _lambdacustomer import _LambdaCustomerKeywords
 
 __all__ = [
     "_LambdaSysAuthKeywords",
-   "_LambdaSysOrganizeKeywords",
+    "_LambdaSysOrganizeKeywords",
     "_LambdaSysUserKeywords",
     "_LambdaCustomerKeywords"
 ]

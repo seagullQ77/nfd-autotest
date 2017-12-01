@@ -2,7 +2,7 @@
 from importlib import import_module
 from faker.utils.loading import find_available_locales, find_available_providers
 
-DEFAULT_LOCALE = 'zh_CN'
+DEFAULT_LOCALE = 'en_US'
 
 META_PROVIDERS_MODULES = [
     'faker.providers',

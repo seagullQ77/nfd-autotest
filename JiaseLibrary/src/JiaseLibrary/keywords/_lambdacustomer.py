@@ -1,5 +1,6 @@
  # -*- coding:utf-8 -*-
 import json
+from robot.api import logger
 
 class _LambdaCustomerKeywords():
     
@@ -49,6 +50,6 @@ class _LambdaCustomerKeywords():
         res = self._request.post(url,headers=self._headers,data=json.dumps(payload))
         status = json.loads(res.content.decode('utf-8')).get('statusCode')
         if status == '0':
-            print(u'新增个人客户成功:%s' %custName)
+            logger.info(u'新增个人客户成功:%s' %custName)
         else:
-            print(u'新增个人客户失败:%s' %custName)
+            raise AssertionError(u'新增个人客户失败:%s' %custName)

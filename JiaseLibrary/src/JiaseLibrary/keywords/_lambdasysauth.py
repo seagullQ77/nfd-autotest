@@ -32,11 +32,9 @@ class _LambdaSysAuthKeywords():
                 usr=self._lambda_super_admin
         if psd is None:
             psd = self._lambda_all_psd
-            
-        print 'user/psd:%s %s'%(usr,psd)
-    
+              
         psd = hashlib.sha256(psd.encode()).hexdigest()
-        print psd    
+  
         
         url = '%s/auth/login' % self._lambda_url
         payload =   {
@@ -46,7 +44,7 @@ class _LambdaSysAuthKeywords():
         res = self._request.post(url,headers=self._headers,data=json.dumps(payload))        
         
         res_content = json.loads(res.content.decode('utf-8'))
-        print res_content
+ 
         res_data = res_content.get('data')
         status = res_content.get('statusCode')
         if status == 'SYS_408':
@@ -64,11 +62,12 @@ class _LambdaSysAuthKeywords():
             res = self._request.post(url,headers=self._headers,data=json.dumps(payload))
             status = json.loads(res.content.decode('utf-8')).get('statusCode')
             if status == '0':
-                print '登录lambda成功:%s'%usr
                 logger.info(u'登录lambda成功:%s'%usr)
             else:
+                logger.error(u'登录lambda失败:%s'%usr)
                 raise AssertionError(u'登录lambda失败:%s'%usr)
         else:
+            logger.error(u'登录lambda失败:%s'%usr)
             raise AssertionError(u'登录lambda失败:%s'%usr)      
             
     '''
@@ -82,7 +81,7 @@ class _LambdaSysAuthKeywords():
         if status != '0':
             raise AssertionError(u'退出lambda失败')
         else:
-            print '当前用户退出登录'
+            logger.info('当前用户退出登录')
     
         
                    

@@ -44,9 +44,10 @@ class _LambdaSysUserKeywords():
         res = self._request.post(url,headers=self._headers,data=json.dumps(payload))
         status = json.loads(res.content.decode('utf-8')).get('statusCode')
         if status == '0':
-            print(u'新增用户成功:%s' %account)           
+            logger.info(u'新增用户成功:%s' %account)           
         else:
-            print(u'新增用户失败:%s' %account)
+            logger.error(u'新增用户失败:%s' %account)
+            raise AssertionError(u'新增用户失败:%s' %account)
         
         user_id = json.loads(res.content.decode('utf-8')).get('data')
         password = idCardNo[-4:] + staffId
@@ -71,10 +72,11 @@ class _LambdaSysUserKeywords():
         res = self._request.post(url,data=payload,headers=headers)
         status = json.loads(res.content.decode('utf-8')).get('statusCode')
         if status == '0':
-            print(u'修改账号密码成功:%s' %account)
+            logger.info(u'修改账号密码成功:%s' %account)
             return json.loads(res.content.decode('utf-8')).get('data')
         else:
-            print(u'修改账号密码失败:%s' %account)
+            logger.error(u'修改账号密码失败:%s' %account)
+            raise AssertionError(u'修改账号密码失败:%s' %account)
         
     
     '''添加用户
@@ -113,10 +115,11 @@ class _LambdaSysUserKeywords():
         res = self._request.post(url,data=payload)
         status = json.loads(res.content.decode('utf-8')).get('statusCode')
         if status == '0':
-            print(u'新增用户明细成功:%s' %account) 
+            logger.info(u'新增用户明细成功:%s' %account) 
             self._update_user_password_by_db(account)        
         else:
-            print(u'新增用户明细失败:%s' %account)
+            logger.error(u'新增用户明细失败:%s' %account) 
+            raise AssertionError(u'新增用户明细失败:%s' %account)
                     
     
 

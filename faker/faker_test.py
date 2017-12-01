@@ -3,7 +3,7 @@ VERSION = '0.5.7'
 
 from faker.factory import Factory
 
-myfaker = Factory.create(locale='zh_CN')
+myfaker = Factory.create('zh_CN')
 
 print myfaker.person_id() #随机生成符合校验规则的身份证号
     
