@@ -3,7 +3,7 @@ import json
 import hashlib
 from robot.api import logger
 from warnings import catch_warnings
-from JiaseLibrary.utils.lambda_db import LambdaDbCon
+from utils.lambda_db import LambdaDbCon
 
 class _LambdaSysUserKeywords():
     
@@ -13,31 +13,31 @@ class _LambdaSysUserKeywords():
         self._lambda_all_psd     = None
         self._lambda_super_admin = None
 
-    def _add_user(self,account=None,realName=None,branchId=None):
+    def _add_user(self,account=None,real_name=None,branch_id=None):
         url = '%s/sys/users/create' %self._lambda_url
         if account is None:
             account = self._faker.phone_number()
-        if realName is None:
-            realName = self._faker.name()
-        if branchId is None:
-            branchId = self._faker.phone_number()    
-        staffId = str(self._faker.random_int(1000,9999))    
-        idCardNo = self._faker.person_id()
-        if int(idCardNo[16])%2 == 0:
+        if real_name is None:
+            real_name = self._faker.name()
+        if branch_id is None:
+            branch_id = self._faker.phone_number()    
+        staff_id = str(self._faker.random_int(1000,9999))    
+        id_card_no = self._faker.person_id()
+        if int(id_card_no[16])%2 == 0:
             sex= 'F'
         else:
             sex = 'M'
         payload =   {
-                    "staffId":staffId,
-                    "realName":realName,
+                    "staffId":staff_id,
+                    "realName":real_name,
                     "mobilePhone":account,
                     "sex":sex,
-                    "idCardNo":idCardNo,
+                    "idCardNo":id_card_no,
                     "userStatus":"NORMAL",
                     "wechatId":"test",
                     "email":"test@test",
                     "userDesc":"",
-                    "branchId":branchId,
+                    "branchId":branch_id,
                     "account":account,
                     "id":""
                     }
@@ -50,7 +50,7 @@ class _LambdaSysUserKeywords():
             raise AssertionError(u'新增用户失败:%s' %account)
         
         user_id = json.loads(res.content.decode('utf-8')).get('data')
-        password = idCardNo[-4:] + staffId
+        password = id_card_no[-4:] + staff_id
         return (user_id,account,password) 
     
     
@@ -95,22 +95,22 @@ class _LambdaSysUserKeywords():
        branchId:所属机构id,为None则随机选择       
     '''     
             
-    def add_lambda_user(self,account=None,realName=None,branch_name=None,
+    def add_lambda_user(self,account=None,real_name=None,branch_name=None,
                         dept_name=None,position_name=None,role_name=None):
-        branchId = self._query_branchId(branch_name)
-        userinfo = self._add_user(account,realName,branchId)
-        account = userinfo[1]
-        deptId = self._query_deptId(branchId, dept_name)
-        positionId = self._query_positionId(branchId, position_name)
-        roleId = self._query_roleId(deptId, role_name)
+        branch_id = self._query_branch_id(branch_name)
+        user_info = self._add_user(account,real_name,branch_id)
+        account = user_info[1]
+        dept_id = self._query_dept_id(branch_id, dept_name)
+        position_id = self._query_position_id(branch_id, position_name)
+        role_id = self._query_role_id(dept_id, role_name)
     
         url = '%s/sys/users/insert_position_roles' %self._lambda_url    
         payload =   {
-                    "userId":userinfo[0],
-                    "roleIds":roleId,
-                    "positionIds":positionId,
-                    "deptId":deptId,
-                    "branchId":branchId
+                    "userId":user_info[0],
+                    "roleIds":role_id,
+                    "positionIds":position_id,
+                    "deptId":dept_id,
+                    "branchId":branch_id
                     }
         res = self._request.post(url,data=payload)
         status = json.loads(res.content.decode('utf-8')).get('statusCode')

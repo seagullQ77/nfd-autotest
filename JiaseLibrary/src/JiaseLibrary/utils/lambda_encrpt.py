@@ -18,8 +18,7 @@ class LambdaEncrpt():
         pad_it = lambda s: s + (BS - len(s) % BS) * chr(BS - len(s) % BS) 
         generator = AES.new(self.key, self.mode, self.iv)
         crypt = generator.encrypt(pad_it(source))   
-        cryptedStr = base64.b64encode(crypt)
-        print cryptedStr 
+        cryptedStr = base64.b64encode(crypt) 
         return cryptedStr
     
     def _decrypt(self,text):

@@ -25,7 +25,7 @@ class _LambdaSysAuthKeywords():
             if hasattr(self, '_%s'%role):
                 usr = getattr(self,'_%s'%role)           
             else:
-                print 'Role: %s not defined in config.cfg,please check again' %role
+                logger.error('Role: %s not defined in config.cfg,please check again' %role)
                 raise AssertionError('Role: %s not defined in config.cfg,please check again' %role)
         else:      
             if usr is None:

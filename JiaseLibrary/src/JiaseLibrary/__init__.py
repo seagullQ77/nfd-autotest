@@ -17,6 +17,10 @@ class JiaseLibrary(
     _LambdaSysOrganizeKeywords,
     _LambdaSysUserKeywords,
     _LambdaCustomerKeywords,
+    _LambdaLoanKeywords,
+    _LambdaContractKeywords,
+    _LambdaWithdrawalKeywords,
+    _LambdaRepaymentKeywords
 ):
 
     ROBOT_LIBRARY_SCOPE = 'GLOBAL'
@@ -57,6 +61,7 @@ class JiaseLibrary(
 if __name__ == '__main__':
     jiase = JiaseLibrary()
     jiase.login_lambda(role='lambda_invest_manager')
-    jiase.add_custom_personal(custKind='DKKH')
-    #jiase.add_loan()
-    #jiase.add_lambda_user(branch_name=u'投资发展七部',dept_name=u'市场部',position_name=u'投资经理岗',role_name=u'投资经理')
+    # jiase.add_custom_personal(cust_kind='DKKH')
+    # jiase.add_loan()
+    # jiase.login_lambda()
+    # jiase.add_lambda_user(branch_name=u'投资发展六部',dept_name=u'市场部',position_name=u'投资经理岗',role_name=u'投资经理')
