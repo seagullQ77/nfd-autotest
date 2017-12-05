@@ -1,3 +1,7 @@
+import os
+import sys
+CURRENT_DIR = os.path.abspath(os.path.dirname(__file__))
+sys.path.append(CURRENT_DIR)
 from _lambdasysauth import _LambdaSysAuthKeywords
 from _lambdasysorganize import _LambdaSysOrganizeKeywords
 from _lambdasysuser import _LambdaSysUserKeywords

@@ -1,14 +1,16 @@
- # -*- coding:utf-8 -*-
+# -*- coding:utf-8 -*-
+
 import os
 import requests
-import ConfigParser
+import configparser
 from keywords import *
+from utils import *
 from version import VERSION
 from faker.factory import Factory
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-CONF_PATH = BASE_DIR  + "\\JiaseLibrary\\config\\config.cfg"
 
+CONF_PATH = BASE_DIR  + "\\JiaseLibrary\\config\\config.cfg"
 
 __version__ = VERSION
 
@@ -32,8 +34,8 @@ class JiaseLibrary(
         self._get_config_lambda()
         
     def _get_config_lambda(self):
-        cf = ConfigParser.ConfigParser()
-        cf.read(CONF_PATH)
+        cf = configparser.ConfigParser()
+        cf.read(CONF_PATH,encoding='utf-8')
         self._lambda_host                   = cf.get('lambda_web','lambda_host')
         self._lambda_port                   = cf.get('lambda_web','lambda_port')
         self._lambda_url                    = 'http://%s:%s' %(self._lambda_host,self._lambda_port)     
@@ -52,7 +54,8 @@ class JiaseLibrary(
         self._lambda_finance_director       = cf.get('lambda_roles','lambda_finance_director')      
         self._lambda_repay_match            = cf.get('lambda_roles','lambda_repay_match')           
         self._lambda_meeting_audit          = cf.get('lambda_roles','lambda_meeting_audit')
-        
+        self._lambda_db_env                 = cf.get('lambda_db_decryption', 'lambda_db_env')
+
     def _init_request_arg(self):
         self._request = requests.session()
         self._headers = {"Content-Type": "application/json"}

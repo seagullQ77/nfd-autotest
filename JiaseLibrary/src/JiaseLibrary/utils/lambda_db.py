@@ -6,16 +6,17 @@ from lambda_encrpt import LambdaEncrpt
 '''
 class LambdaDbCon():
     
-    def __init__(self,host):
+    def __init__(self,host,env='lambda_test'):
         self.db_host=host
-        self.db_user='SecureTeam'
-        self.db_passwd='Aqdy(%@#'
+        self.db_user='GreatTeam'
+        self.db_passwd='Tapd!%!^'
         self.db_port=9527
         self.db_charset="utf8"
+        self.env = env
         self.connect = pymysql.connect(host=self.db_host, user=self.db_user, passwd=self.db_passwd, 
                                     port=self.db_port,charset=self.db_charset)
         self.cursor = self.connect.cursor()
-        self.lambda_encrpt = LambdaEncrpt()
+        self.lambda_encrpt = LambdaEncrpt(env)
           
     def update_sys_user_password(self,account):       
         self.connect.select_db('lambda')
