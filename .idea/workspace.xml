@@ -1,16 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="4f744e95-ff1d-40a7-88ae-76b12988cea1" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/TestScript.iml" afterPath="$PROJECT_DIR$/.idea/TestScript.iml" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
+    <list default="true" id="4f744e95-ff1d-40a7-88ae-76b12988cea1" name="Default" comment="改成python3">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change beforePath="$PROJECT_DIR$/JiaseLibrary/src/JiaseLibrary/__init__.py" afterPath="$PROJECT_DIR$/JiaseLibrary/src/JiaseLibrary/__init__.py" />
       <change beforePath="$PROJECT_DIR$/JiaseLibrary/src/JiaseLibrary/config/config.cfg" afterPath="$PROJECT_DIR$/JiaseLibrary/src/JiaseLibrary/config/config.cfg" />
       <change beforePath="$PROJECT_DIR$/JiaseLibrary/src/JiaseLibrary/keywords/__init__.py" afterPath="$PROJECT_DIR$/JiaseLibrary/src/JiaseLibrary/keywords/__init__.py" />
-      <change beforePath="$PROJECT_DIR$/JiaseLibrary/src/JiaseLibrary/keywords/_lambdaloan.py" afterPath="$PROJECT_DIR$/JiaseLibrary/src/JiaseLibrary/keywords/_lambdaloan.py" />
+      <change beforePath="$PROJECT_DIR$/JiaseLibrary/src/JiaseLibrary/keywords/_lambdacustomer.py" afterPath="$PROJECT_DIR$/JiaseLibrary/src/JiaseLibrary/keywords/_lambdacustomer.py" />
       <change beforePath="$PROJECT_DIR$/JiaseLibrary/src/JiaseLibrary/utils/__init__.py" afterPath="$PROJECT_DIR$/JiaseLibrary/src/JiaseLibrary/utils/__init__.py" />
-      <change beforePath="$PROJECT_DIR$/JiaseLibrary/src/JiaseLibrary/utils/lambda_db.py" afterPath="$PROJECT_DIR$/JiaseLibrary/src/JiaseLibrary/utils/lambda_db.py" />
       <change beforePath="$PROJECT_DIR$/JiaseLibrary/src/JiaseLibrary/utils/lambda_encrpt.py" afterPath="$PROJECT_DIR$/JiaseLibrary/src/JiaseLibrary/utils/lambda_encrpt.py" />
     </list>
     <ignored path="TestScript.iws" />
@@ -39,21 +36,31 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="__init__.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="__init__.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/JiaseLibrary/src/JiaseLibrary/__init__.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="418">
-              <caret line="22" column="28" lean-forward="true" selection-start-line="22" selection-start-column="28" selection-end-line="22" selection-end-column="28" />
+            <state relative-caret-position="-209">
+              <caret line="10" column="53" lean-forward="false" selection-start-line="10" selection-start-column="53" selection-end-line="10" selection-end-column="53" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="_lambdasysuser.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/JiaseLibrary/src/JiaseLibrary/keywords/_lambdasysuser.py">
+      <file leaf-file-name="lambda_encrpt.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/JiaseLibrary/src/JiaseLibrary/utils/lambda_encrpt.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="95">
-              <caret line="23" column="32" lean-forward="false" selection-start-line="23" selection-start-column="32" selection-end-line="23" selection-end-column="32" />
+            <state relative-caret-position="492">
+              <caret line="39" column="0" lean-forward="false" selection-start-line="39" selection-start-column="0" selection-end-line="39" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="config.cfg" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/JiaseLibrary/src/JiaseLibrary/config/config.cfg">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="549">
+              <caret line="47" column="0" lean-forward="true" selection-start-line="47" selection-start-column="0" selection-end-line="47" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -62,8 +69,8 @@
       <file leaf-file-name="__init__.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/JiaseLibrary/src/JiaseLibrary/keywords/__init__.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="57">
-              <caret line="3" column="28" lean-forward="false" selection-start-line="3" selection-start-column="28" selection-end-line="3" selection-end-column="28" />
+            <state relative-caret-position="456">
+              <caret line="24" column="0" lean-forward="true" selection-start-line="24" selection-start-column="0" selection-end-line="24" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -82,8 +89,8 @@
       <file leaf-file-name="_lambdacustomer.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/JiaseLibrary/src/JiaseLibrary/keywords/_lambdacustomer.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-228">
-              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+            <state relative-caret-position="589">
+              <caret line="88" column="0" lean-forward="false" selection-start-line="88" selection-start-column="0" selection-end-line="88" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -121,21 +128,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="config.cfg" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/JiaseLibrary/src/JiaseLibrary/config/config.cfg">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="285">
-              <caret line="15" column="6" lean-forward="true" selection-start-line="15" selection-start-column="6" selection-end-line="15" selection-end-column="6" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="__init__.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/JiaseLibrary/src/JiaseLibrary/utils/__init__.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="76">
-              <caret line="4" column="33" lean-forward="false" selection-start-line="4" selection-start-column="22" selection-end-line="4" selection-end-column="33" />
+            <state relative-caret-position="190">
+              <caret line="10" column="1" lean-forward="false" selection-start-line="10" selection-start-column="1" selection-end-line="10" selection-end-column="1" />
               <folding />
             </state>
           </provider>
@@ -166,13 +163,14 @@
         <option value="$PROJECT_DIR$/yaojiang.txt" />
         <option value="$PROJECT_DIR$/lottery.py" />
         <option value="$PROJECT_DIR$/loanGeneratorTool/standardGeneratorApi.py" />
-        <option value="$PROJECT_DIR$/JiaseLibrary/src/JiaseLibrary/utils/__init__.py" />
-        <option value="$PROJECT_DIR$/JiaseLibrary/src/JiaseLibrary/keywords/__init__.py" />
-        <option value="$PROJECT_DIR$/JiaseLibrary/src/JiaseLibrary/utils/lambda_encrpt.py" />
-        <option value="$PROJECT_DIR$/JiaseLibrary/src/JiaseLibrary/config/config.cfg" />
         <option value="$PROJECT_DIR$/JiaseLibrary/src/JiaseLibrary/utils/lambda_db.py" />
         <option value="$PROJECT_DIR$/JiaseLibrary/src/JiaseLibrary/keywords/_lambdaloan.py" />
+        <option value="$PROJECT_DIR$/JiaseLibrary/src/JiaseLibrary/keywords/_lambdacustomer.py" />
+        <option value="$PROJECT_DIR$/JiaseLibrary/src/JiaseLibrary/keywords/__init__.py" />
+        <option value="$PROJECT_DIR$/JiaseLibrary/src/JiaseLibrary/utils/__init__.py" />
         <option value="$PROJECT_DIR$/JiaseLibrary/src/JiaseLibrary/__init__.py" />
+        <option value="$PROJECT_DIR$/JiaseLibrary/src/JiaseLibrary/utils/lambda_encrpt.py" />
+        <option value="$PROJECT_DIR$/JiaseLibrary/src/JiaseLibrary/config/config.cfg" />
       </list>
     </option>
   </component>
@@ -616,7 +614,14 @@
       <option name="project" value="LOCAL" />
       <updated>1465993536105</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="美化了代码格式">
+      <created>1512456976060</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1512456976060</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -774,26 +779,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/JiaseLibrary/src/JiaseLibrary/utils/lambda_encrpt.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="506">
-          <caret line="41" column="25" lean-forward="false" selection-start-line="41" selection-start-column="25" selection-end-line="41" selection-end-column="25" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/JiaseLibrary/src/JiaseLibrary/keywords/_lambdasysorganize.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/JiaseLibrary/src/JiaseLibrary/config/config.cfg">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="285">
-          <caret line="15" column="6" lean-forward="true" selection-start-line="15" selection-start-column="6" selection-end-line="15" selection-end-column="6" />
           <folding />
         </state>
       </provider>
@@ -814,14 +803,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/JiaseLibrary/src/JiaseLibrary/utils/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="76">
-          <caret line="4" column="33" lean-forward="false" selection-start-line="4" selection-start-column="22" selection-end-line="4" selection-end-column="33" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/JiaseLibrary/src/JiaseLibrary/keywords/_lambdasysuser.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="95">
@@ -830,25 +811,9 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/JiaseLibrary/src/JiaseLibrary/keywords/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="57">
-          <caret line="3" column="28" lean-forward="false" selection-start-line="3" selection-start-column="28" selection-end-line="3" selection-end-column="28" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/JiaseLibrary/src/JiaseLibrary/keywords/_lambdacontract.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/JiaseLibrary/src/JiaseLibrary/keywords/_lambdacustomer.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-228">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
         </state>
@@ -880,10 +845,50 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/JiaseLibrary/src/JiaseLibrary/keywords/_lambdacustomer.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="589">
+          <caret line="88" column="0" lean-forward="false" selection-start-line="88" selection-start-column="0" selection-end-line="88" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/JiaseLibrary/src/JiaseLibrary/keywords/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="456">
+          <caret line="24" column="0" lean-forward="true" selection-start-line="24" selection-start-column="0" selection-end-line="24" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/JiaseLibrary/src/JiaseLibrary/utils/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="190">
+          <caret line="10" column="1" lean-forward="false" selection-start-line="10" selection-start-column="1" selection-end-line="10" selection-end-column="1" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/JiaseLibrary/src/JiaseLibrary/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="418">
-          <caret line="22" column="28" lean-forward="true" selection-start-line="22" selection-start-column="28" selection-end-line="22" selection-end-column="28" />
+        <state relative-caret-position="-209">
+          <caret line="10" column="53" lean-forward="false" selection-start-line="10" selection-start-column="53" selection-end-line="10" selection-end-column="53" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/JiaseLibrary/src/JiaseLibrary/utils/lambda_encrpt.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="492">
+          <caret line="39" column="0" lean-forward="false" selection-start-line="39" selection-start-column="0" selection-end-line="39" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/JiaseLibrary/src/JiaseLibrary/config/config.cfg">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="549">
+          <caret line="47" column="0" lean-forward="true" selection-start-line="47" selection-start-column="0" selection-end-line="47" selection-end-column="0" />
           <folding />
         </state>
       </provider>

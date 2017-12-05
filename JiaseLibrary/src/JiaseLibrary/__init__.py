@@ -9,7 +9,6 @@ from version import VERSION
 from faker.factory import Factory
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-
 CONF_PATH = BASE_DIR  + "\\JiaseLibrary\\config\\config.cfg"
 
 __version__ = VERSION

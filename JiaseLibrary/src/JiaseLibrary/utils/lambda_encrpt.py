@@ -36,7 +36,8 @@ class LambdaEncrpt():
         decryStr = unpad(recovery)
         print(decryStr.decode())
         return decryStr.decode()
- 
+
+
 if __name__ == '__main__':
     key = key_dict.get('lambda_test')
     pc = LambdaEncrpt(key)
