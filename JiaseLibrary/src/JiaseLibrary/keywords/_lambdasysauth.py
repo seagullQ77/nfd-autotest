@@ -81,7 +81,7 @@ class _LambdaSysAuthKeywords():
         if status != '0':
             raise AssertionError(u'退出lambda失败')
         else:
-            logger.info('当前用户退出登录')
+            logger.info(u'当前用户退出登录')
     
         
                    
