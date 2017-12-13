@@ -41,7 +41,7 @@ class _LambdaContractKeywords():
                 logger.info('%s合同签约成功'%con_info[3])
             else:
                 #print(statusDesc + '——%s合同签约失败'%con_info[3])
-                logger.error('%s合同签约失败——%s' % statusDesc)
+                logger.error('%s合同签约失败——'%con_info[3]+statusDesc)
                 #raise AssertionError('合同签约失败——%s' % statusDesc)
 
 

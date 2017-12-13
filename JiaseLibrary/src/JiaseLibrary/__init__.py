@@ -67,7 +67,7 @@ class JiaseLibrary(
 if __name__ == '__main__':
     jiase = JiaseLibrary()
     jiase.login_lambda(role='lambda_invest_manager')
-    jiase.sign_loan_contract(81)
+    jiase.sign_loan_contract(88)
     #jiase.add_custom_personal(cust_kind='DKKH')
     #jiase.add_loan()
     # # withdrawal_detailId,custId = jiase.create_withdrawal_apply('方圆','GR')
