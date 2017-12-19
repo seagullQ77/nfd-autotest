@@ -1,14 +1,13 @@
  # -*- coding:utf-8 -*-
 import json
 from robot.api import logger
-import requests
 
 class _LambdaContractKeywords():
     
     def __init__(self):
         self._lambda_url= None
 
-    # 合同签订
+
     # loan_id 贷款申请的id,需要根据贷款申请id查询到对应的合同id
     def _query_con_id(self,loan_id):
         url = '%s/contract/main/list' % self._lambda_url
@@ -21,12 +20,22 @@ class _LambdaContractKeywords():
                     return i.get('id'),i.get('signStatus'),i.get('contractNo'),i.get('custName')
 
 
+    #查询操作，确定签订后合同状态是否变为了已签订
+    def _check_loan_contract_status(self, loan_id):
+        con_info = self._query_con_id(loan_id)
+        if con_info[1] == 'YQD':
+            logger.info('%s合同签约成功,可继续申请提款' % con_info[3])
+        else:
+            logger.info('%s合同状态（%s）有误，签约失败,请查看原因——' %(con_info[3],con_info[1]))
+            raise AssertionError('%s合同状态（%s）有误，签约失败,请查看原因——' %(con_info[3] %con_info[1]) )
+
+
+    # 合同签订
     def sign_loan_contract(self,loan_id=None):
         con_info = self._query_con_id(loan_id)
-        #print (con_info)
         if con_info[1] == 'YQD':
-            #print('%s合同已签订'%con_info[3])
             logger.info('%s合同已签订'%con_info[3])
+            raise AssertionError('%s合同已签约，请检查流程是否正确' % con_info[3])
         else:
             url = '%s/contract/main/sign' % self._lambda_url
             payload = {
@@ -37,12 +46,17 @@ class _LambdaContractKeywords():
             status = json.loads(res.content.decode('utf-8')).get('statusCode')
             statusDesc = json.loads(res.content.decode('utf-8')).get('statusDesc')
             if status == '0':
-                #print('%s合同签约成功'%con_info[3])
-                logger.info('%s合同签约成功'%con_info[3])
+                self._check_loan_contract_status(loan_id)
             else:
-                #print(statusDesc + '——%s合同签约失败'%con_info[3])
                 logger.error('%s合同签约失败——'%con_info[3]+statusDesc)
-                #raise AssertionError('合同签约失败——%s' % statusDesc)
+                raise AssertionError('%s合同签约失败——'%con_info[3]+statusDesc)
+
+
+
+
+
+
+
 
 
 

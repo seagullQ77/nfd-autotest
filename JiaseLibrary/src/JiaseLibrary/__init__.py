@@ -67,11 +67,8 @@ class JiaseLibrary(
 if __name__ == '__main__':
     jiase = JiaseLibrary()
 
-    jiase.login_lambda(role='lambda_invest_manager')
+    jiase.login_lambda(role='lambda_invest_manager')#投资经理登录
     jiase.sign_loan_contract(88)
-
-
-    jiase.login_lambda(role='lambda_invest_manager') #投资经理登录
 
     #jiase.add_custom_personal(cust_kind='DKKH')
     #jiase.add_loan()

@@ -60,9 +60,24 @@ class _LambdaRepaymentKeywords():
     
     
     # 新增提前还款申请
-    # lend_code:借据号
+    # lend_code:借据号IOU2017111300019
     # issue:期数
     def _create_prepay_apply(self,lend_code=None):
+        url = '%s/repayment/prepay/apply/create' % self._lambda_url
+        payload = {
+           lend_code:lend_code
+        }
+        res = self._request.post(url,headers = self.headers,data=json.dumps(payload))
+        response = res.content.decode('utf-8')
+        statusCode = json.loads(response).get('statusCode')
+        statusDesc = json.loads(response).get('statusDesc')
+        if statusCode == 0:
+            prepay_id = json.loads(response).get('data')
+            return prepay_id
+        else:
+            logger.info(statusDesc)
+            raise AssertionError(statusDesc)
+
         return prepay_id
     
     # 保存提前还款申请
