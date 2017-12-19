@@ -82,11 +82,11 @@ class _LambdaWithdrawalKeywords():
             bizCode=json.loads(res.content.decode()).get('data').get('withdrawalCode')#提款编号withdrawalCode=DRA2017121400001
             return details,bizCode
 
-    def get_delegate_bank(self,withdrawalApplyId,custId=None):
+    def get_delegate_bank(self,withdrawalId,custId=None):
         #获取提款对应的第三方银行卡列表
         url = "%s/withdrawal/delegate/bank/list" % self._lambda_url
         params = {
-            "withdrawalApplyId":withdrawalApplyId,
+            "withdrawalApplyId":withdrawalId,
             "custId":custId
             }
         res = self._request.get(url,params = params)
@@ -103,47 +103,53 @@ class _LambdaWithdrawalKeywords():
                 banklist.append(i)
         return(banklist)
 
-    def create_delegate_bank(self,withdrawalApplyId,custId=None):
+    def create_delegate_bank(self,withdrawalId,custId=None):
         #创建跟提款关联的第三方银行卡返回可用的银行卡列表（过滤掉信息不完善的银行卡）
         url = "%s/withdrawal/delegate/bank/create" % self._lambda_url
         data =      {
-                "accountName":'test_new',
-                "cardNo":'384750923840293',#银行帐号
-                "preIdno":'394758092384302955',#身份证号码
-                "prePhone":"18600000001",#银行预留手机号
-                "bankCode":'402584009991',
-                "bankId":'36',
-                "bankName":'深圳农村商业银行',
-                "isCorporateAccount":"false",
-                "bankDeposit":'深圳龙岗鼎业村镇银行龙华支行',#支行
-                "bankNumber":'320584000031',#行号
-                "withdrawalApplyId":withdrawalApplyId,
-                "custId":custId,
-                "preIdtype":'GR_SFZ'   #=GR_SFZ
+                "accountName": 'test_new',
+                "cardNo": '384750923840293',  # 银行帐号
+                "preIdno": '394758092384302955',  # 身份证号码
+                "prePhone": "18600000001",  # 银行预留手机号
+                "bankCode": '402584009991',
+                "bankId": '36',
+                "bankName": '深圳农村商业银行',
+                "isCorporateAccount": "false",
+                "bankDeposit": '深圳龙岗鼎业村镇银行龙华支行',  # 支行
+                "bankNumber": '320584000031',  # 行号
+                "withdrawalApplyId": withdrawalId,
+                "custId": custId,
+                "preIdtype": 'GR_SFZ'   # =GR_SFZ
                 }
-        res = self._request.post(url,headers=self._headers,data=json.dumps(data))
-        response = res.content.decode()
+        res = self._request.post(url, headers=self._headers, data=json.dumps(data))
+        # response = res.content.decode()
         status = json.loads(res.content.decode()).get('statusCode')
         if status == '0':
             pass
         else:
             statusDesc = json.loads(res.content.decode()).get('statusDesc')
-            print('新增第三方银行卡失败:%s' %statusDesc)
+            print('新增第三方银行卡失败:%s' % statusDesc)
             return
-    def get_withdrawal_apply_account(self,withdrawalId):
+
+    def get_withdrawal_account(self, withdrawalId):
+
         """
         withdrawalId:提款申请id
+        功能：获取提款对应的支付对象列表数据
         """
-        #获取提款的支付对象列表，加总支付对象的金额
+
         url = "%s/withdrawal/pay/account/list" % self._lambda_url
         params = {
-            "id":withdrawalId
+            "id": withdrawalId
             }
-        res = self._request.get(url,params=params)  #webforms格式的参数
+        res = self._request.get(url, params=params)  # webforms格式的参数
         status = json.loads(res.content.decode()).get('statusCode')
-        if status =='0':
-            account_list = json.loads(res.content.decode()).get('data')  #获取提款的所有支付对象
+        if status == '0':
+            account_list = json.loads(res.content.decode()).get('data')  # 获取提款的所有支付对象
             return account_list
+        else:
+            statusDesc = json.loads(res.content.decode()).get('statusDesc')
+            raise Exception('获取提款对应的支付对象列表数据失败：%s' %statusDesc)
 
     def get_custBank(custId):
         url = "%s/cust/bank/accounts/list" % self._lambda_url
@@ -153,8 +159,8 @@ class _LambdaWithdrawalKeywords():
                 }
         """
         params = {
-                "custId":custId   
-                }  
+                "custId": custId   
+                 }  
         res = self._request.get(url,params=params)
         response = res.content.decode()     
         r =  json.loads(response).get('data') #客户银行列表
@@ -171,34 +177,34 @@ class _LambdaWithdrawalKeywords():
         return(banklist)
 
     # 新建支付对象
-    def create_withdrawal_apply_account(self,details,custId,payName=None,payType=None,payAmt=1000,Duration=None):
+    def add_withdrawal_account(self,details,custId,payName=None,payType=None,payAmt=1000,Duration=None):
         """
         payName:支付对象
         payType:支付对象的客户类型——GR,QY
         payAmt：支付金额
         Duration：期限
         """
-        #提款申请支付对象提交
+        # 提款申请支付对象提交
         withdrawalId = details['withdrawalId']
         if details['loanPaymentMode'] == 'ZZZF':
-            #如果是自主支付，直接获取客户银行卡列表
-            banklist = self.get_custBank(custId)#获取客户银行卡列表，接口从客户模块来（待联调）
-            #banklist = [{'accountName': '方圆久', 'bankDeposit': '中国工商银行深圳市分行', 'bankName': '中国工商银行', 'cardNo': '3111182159021202', 'preIdtype': 'GR_SFZ', 'omegaId': '', 'updateBy': 'wlh_投资经理1', 'custId': 31, 'id': 32, 'bankNumber': '102584000002', 'bankCode': '102100099996', 'showEdit': True, 'accountNamePy': 'fang,yuan,jiu', 'otherBankName': '', 'updateTime': 1510654948000, 'preIdno': '922825772275372829', 'custName': '方圆', 'omegaTab': '', 'updateById': 2, 'prePhone': '18600000001', 'isCorporateAccount': False, 'bankId': 2, 'createBy': 'wlh_投资经理1', 'createTime': 1510654949000, 'fatorVerify': False, 'withdrawalApplyId': '', 'bankNameAbb': 'ICBC', 'createById': 2}]
-            if len(banklist) ==0:
-                self.create_custBank(custId) #自主支付，如果客户银行卡列表为空，则新建银行卡（新建银行卡接口从客户模块来，待联调）
+            # 如果是自主支付，直接获取客户银行卡列表
+            banklist = self.get_custBank(custId)  # 获取客户银行卡列表，接口从客户模块来（待联调）
+            # banklist = [{'accountName': '方圆久', 'bankDeposit': '中国工商银行深圳市分行', 'bankName': '中国工商银行', 'cardNo': '3111182159021202', 'preIdtype': 'GR_SFZ', 'omegaId': '', 'updateBy': 'wlh_投资经理1', 'custId': 31, 'id': 32, 'bankNumber': '102584000002', 'bankCode': '102100099996', 'showEdit': True, 'accountNamePy': 'fang,yuan,jiu', 'otherBankName': '', 'updateTime': 1510654948000, 'preIdno': '922825772275372829', 'custName': '方圆', 'omegaTab': '', 'updateById': 2, 'prePhone': '18600000001', 'isCorporateAccount': False, 'bankId': 2, 'createBy': 'wlh_投资经理1', 'createTime': 1510654949000, 'fatorVerify': False, 'withdrawalApplyId': '', 'bankNameAbb': 'ICBC', 'createById': 2}]
+            if len(banklist) == 0:
+                self.create_custBank(custId) # 自主支付，如果客户银行卡列表为空，则新建银行卡（新建银行卡接口从客户模块来，待联调）
         else:
             if payName is not None:
-                if payType =='GR' or payType =='QY':
+                if payType == 'GR' or payType == 'QY':
                     custId = self.get_custid(payName,payType)
-                    banklist = self.get_delegate_bank(withdrawalId,custId)#获取跟提款关联的第三方银行卡列表
-                    if len(banklist) == 0:#如果第三方银行卡列表为空则新建一张银行卡再重新获取列表
-                        self.create_delegate_bank(withdrawalId,custId)
-                        banklist = self.get_delegate_bank(withdrawalId,custId)
+                    banklist = self.get_delegate_bank(withdrawalId, custId)  # 获取跟提款关联的第三方银行卡列表
+                    if len(banklist) == 0:  # 如果第三方银行卡列表为空则新建一张银行卡再重新获取列表
+                        self.create_delegate_bank(withdrawalId, custId)
+                        banklist = self.get_delegate_bank(withdrawalId, custId)
                 else:
                     raise Exception("支付对象payName值不为空，请设置payType参数的值：GR或者QY")
             else:
-                banklist = self.get_delegate_bank(withdrawalId)#获取跟提款关联的第三方银行卡列表
-                if len(banklist) == 0:#如果第三方银行卡列表为空则新建一张银行卡再重新获取列表
+                banklist = self.get_delegate_bank(withdrawalId)  # 获取跟提款关联的第三方银行卡列表
+                if len(banklist) == 0:  # 如果第三方银行卡列表为空则新建一张银行卡再重新获取列表
                     self.create_delegate_bank(withdrawalId)
                     banklist = self.get_delegate_bank(withdrawalId)
         bankid = banklist[0].get('id')
@@ -210,7 +216,7 @@ class _LambdaWithdrawalKeywords():
                 Duration = '120'#如果还款方式为一次性还本付息，则期限为120 天
             else:
                 Duration = '4'#其他还款方式，期限为4 月
-        
+
         url = "%s/withdrawal/pay/account/save" % self._lambda_url
         data =   {
                 "bankId":bankid,
@@ -270,23 +276,23 @@ class _LambdaWithdrawalKeywords():
             #return
 
     
-    def submit_withdrawal_apply(self,withdrawalApplyId):
-        #提交提款申请
+    def submit_withdrawal_apply(self, withdrawalId):
+        # 提交提款申请
         url = "%s/withdrawal/apply/submit" % self._lambda_url
         data = {
-                "withdrawalApplyId":withdrawalApplyId
+                "withdrawalApplyId":withdrawalId
             }
         res = self._request.post(url,data=json.dumps(data),headers=self._headers)
         status = json.loads(res.content.decode()).get('statusCode')
         if status == '0':
-            print('提交提款成功：%s' %withdrawalApplyId)
+            print('提交提款成功：%s' %withdrawalId)
         else:
             statusDesc = json.loads(res.content.decode()).get('statusDesc')
             #print('提交提款失败:%s' %statusDesc)
             raise Exception('提交提款失败:%s' %statusDesc)
     
         
-    def get_taskId(self,bizCode):
+    def get_withdrawal_taskId(self,bizCode):
         #通过业务编号获取taskId
         url = "%s/workbench/withdrawalApply/todoList" % self._lambda_url
         data =   {
@@ -302,7 +308,7 @@ class _LambdaWithdrawalKeywords():
             for i in lst:
                 code = i['bizCode']
                 if code == bizCode:
-                    return i.get('taskId'),i.get('id')
+                    return i.get('taskId') #,i.get('id')  #返回taskId和提款明细id
             else:
                 raise Exception("此用户名下不存在任务编码为%s的提款任务" %bizCode)
                 """
@@ -316,7 +322,7 @@ class _LambdaWithdrawalKeywords():
             raise Exception('获取taskId失败:%s' %statusDesc)
 
     
-    def receive_task(self,taskId):
+    def receive_withdrawal_task(self,taskId):
         #领取任务
         url = "%s/workbench/withdrawalApply/claim" % self._lambda_url
         
@@ -369,7 +375,56 @@ class _LambdaWithdrawalKeywords():
             statusDesc = json.loads(res.content.decode()).get('statusDesc')
             raise Exception("审批通过报错：%s" %statusDesc)
         
-    
+    def get_withdrawal_iou(self,withdrawalId):
+        #获取提款申请借据拆分中的借据列表
+        url = "%s/iou/list" % self._lambda_url
+        params = {
+            "withdrawalId":withdrawalId
+            }
+        res = self._request.get(url,params=params)  #webforms格式的参数
+        status = json.loads(res.content.decode()).get('statusCode')
+        if status == '0':
+            iou_list = json.loads(res.content.decode()).get('list')
+            totalAmt = json.loads(res.content.decode()).get('totalAmt') #剩余可拆分金额
+            return totalAmt,iou_list
+        else:
+            statusDesc = json.loads(res.content.decode()).get('statusDesc')
+            raise Exception("获取提款的借据列表失败：%s" % statusDesc)
+    def create_withdrawal_iou(self,iouAmt,loanDuration,withdrawalId):
+        """
+        功能：拆分借据
+        iouAmt:借据金额
+        loanDuration:借据期限
+        payAccountId:支付对象的id，从支付对象列表中选
+        withdrawalId:对应的提款申请Id
+        """
+        ids = []
+        account_list = self.get_withdrawal_account(withdrawalId)
+        for i in account_list:
+            ids.append(i['id'])
+        url = "%s/iou/create" % self._lambda_url
+        data = {
+            "iouAmt": iouAmt,
+            "loanDuration":loanDuration ,
+            "payeeId":'',
+            "payeeAct":'',
+            "payAccountId": ids[0],
+            "withdrawalId": withdrawalId,
+        }
+        res = self._request.post(url, data=data)  # webforms格式的参数
+        # r = json.loads(res.content.decode())
+        status = json.loads(res.content.decode()).get('statusCode')
+        if status =='0':
+            left_amt = json.loads(res.content.decode()).get('data') #借据拆分后，返回剩余可拆分金额
+            return left_amt
+        else:
+            statusDesc = json.loads(res.content.decode()).get('statusDesc')
+            raise Exception("拆分借据失败：%s" % statusDesc)
+    def del_withdrawal_iou(self):
+        #删除借据
+        #/ iou / delete
+        pass
+
     # 提款申请审批拒绝
     # withdrawal_id: 提款申请id
     def withdrawal_apply_aduit_reject(self,withdrawal_id):

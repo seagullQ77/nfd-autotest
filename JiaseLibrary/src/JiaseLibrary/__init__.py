@@ -61,31 +61,45 @@ class JiaseLibrary(
 
 
 
-
-
-
 if __name__ == '__main__':
     jiase = JiaseLibrary()
 
-    jiase.login_lambda(role='lambda_invest_manager')#投资经理登录
-    jiase.sign_loan_contract(88)
+
+    #jiase.login_lambda(role='lambda_invest_manager')#投资经理登录
+    #jiase.sign_loan_contract(88)
 
     #jiase.add_custom_personal(cust_kind='DKKH')
     #jiase.add_loan()
-    # # 从提款申请到审核通过，步骤如下：
-    # # withdrawal_detailId,custId = jiase.create_withdrawal_apply('黎华县','GR')
-    # # details,bizCode = jiase.withdrawal_apply_view(withdrawal_detailId)
-    # # payAmt = jiase.create_withdrawal_apply_account(details,custId,payName='毛峰尖',payType='GR',payAmt=3000,Duration='5')
-    # # jiase.save_withdrawal_apply(withdrawal_detailId,payAmt)
-    # # withdrawalApplyId = details['withdrawalId'] #获取提款申请id
-    # # jiase.submit_withdrawal_apply(withdrawalApplyId)
-    # # print("---------------------------------提款申请已经完成，下面进入审核流程---------------------------------")
-    # # jiase.login_lambda(role='lambda_loans_a')   #放款岗A登录
-    # # taskId,withdral_detailId = jiase.get_taskId(bizCode)
-    # # jiase.receive_task(taskId)
-    # # jiase.save_withdrawal_apply(withdral_detailId,payAmt)#保存提款详情
-    # # jiase.save_withdrawal_advice(taskId,withdrawalApplyId,withdral_detailId)
-    # # #运行接口发现放款岗没有手动拆借据也可以审核通过
-    # # #可以审批了，还差拆分借据
-    # # jiase.withdrawal_apply_pass(taskId,withdrawalApplyId)
+    """
+    # 从提款申请到审核通过，步骤如下：
+    withdrawal_detailId, custId = jiase.create_withdrawal_apply('黎华县', 'GR')
+    details, bizCode = jiase.withdrawal_apply_view(withdrawal_detailId)
+    payAmt = jiase.add_withdrawal_account(details, custId, payName='毛峰尖', payType='GR', payAmt=3000, Duration='5')
+    jiase.save_withdrawal_apply(withdrawal_detailId, payAmt)
+    withdrawalId = details['withdrawalId']  # 获取提款申请id
+    jiase.submit_withdrawal_apply(withdrawalId)
+    print("---------------------------------提款申请已经完成，下面进入审核流程---------------------------------")
+    #A岗
+    jiase.login_lambda(role='lambda_loans_a')   # 放款岗A登录
+    taskId = jiase.get_withdrawal_taskId(bizCode)
+    jiase.receive_withdrawal_task(taskId)
+    jiase.save_withdrawal_apply(withdral_detailId, payAmt)  # 保存提款详情
+    jiase.save_withdrawal_advice(taskId, withdrawalId, withdral_detailId)
+    # #运行接口发现放款岗没有手动拆借据也可以审核通过
+    totalAmt, iou_list = jiase.get_withdrawal_iou(withdrawalId)
+    if totalAmt !=0:
+        jiase.create_withdrawal_iou(totalAmt,'6',withdrawalId)
+    jiase.withdrawal_apply_pass(taskId,withdrawalId)
+    #B岗
+    jiase.login_lambda(role='lambda_loans_b')   # 放款岗B登录
+    taskId = jiase.get_withdrawal_taskId(bizCode)
+    jiase.receive_withdrawal_task(taskId)
+    jiase.save_withdrawal_apply(withdral_detailId, payAmt)  # 保存提款详情
+    jiase.save_withdrawal_advice(taskId, withdrawalId, withdral_detailId)
+    # #运行接口发现放款岗没有手动拆借据也可以审核通过
+    totalAmt = jiase.get_withdrawal_iou(withdrawalId)
+    if totalAmt !=0:
+        jiase.create_withdrawal_iou(totalAmt,'6',withdrawalId)
+    jiase.withdrawal_apply_pass(taskId,withdrawalId)
+    """
     # jiase.add_lambda_user(branch_name=u'投资发展六部',dept_name=u'市场部',position_name=u'投资经理岗',role_name=u'投资经理')
