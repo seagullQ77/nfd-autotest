@@ -11,7 +11,18 @@ class _LambdaWithdrawalKeywords():
 
         pass
 
-    def get_custid(self,custname,custtype):
+    def withdrawal_get_custid(self,custname,custtype):
+        """
+        【功能】：获取客户id
+
+        【参数】：
+
+        custname: 客户名称
+
+        custtype: 客户类型——GR/QY
+
+        【返回值】：返回客户id
+        """
         #通过custname和custtype获取custid
         if custtype == 'GR':
             url = "%s/cust/infos/personal/list" % self._lambda_url
@@ -43,9 +54,22 @@ class _LambdaWithdrawalKeywords():
     # custtype:客户类型——GR,QY
     # 返回 withdrawal_id 后续其他接口会用到
     def create_withdrawal_apply(self, custname, custtype):
-        # 新建提款
+        """
+        【功能】：新建提款申请
+
+        【参数】：
+
+        custname: 客户名称
+
+        custtype: 客户类型——GR/QY
+
+        【返回值】：
+
+        返回提款明细id 和custid
+        """
+
         url = "%s/withdrawal/apply/create" % self._lambda_url
-        custId = self.get_custid(custname, custtype)
+        custId = self.withdrawal_get_custid(custname, custtype)
         list_contracts = self._get_contract(custId)
 
         for lst in list_contracts:
@@ -68,6 +92,17 @@ class _LambdaWithdrawalKeywords():
                 print("对%s新建提款失败%s" % (contractNo, statusDesc))
 
     def withdrawal_apply_view(self,apply_detailId):
+        """
+        【功能】：获取提款明细的详细信息
+
+        【参数】：
+
+        apply_detailId:提款明细id
+
+        【返回值】：
+
+        返回提款详细信息details和提款编号biz
+        """
         #新建提款成功后，获取提款详细信息，参数为提款详情id
         #apply_detailId,custId = apply_create(custname,custtype,contractno) #获取提款明细id和custid
         url = "%s/withdrawal/apply/view" % self._lambda_url
@@ -83,6 +118,16 @@ class _LambdaWithdrawalKeywords():
             return details,bizCode
 
     def get_delegate_bank(self,withdrawalId,custId=None):
+        """
+        【功能】：获取提款对应的第三方银行卡列表（过滤掉信息不完善的银行卡）
+
+        【参数】：
+         withdrawalId: 提款申请id
+
+         custId: 客户id，默认为空
+
+        【返回值】：返回可用的银行列表
+        """
         #获取提款对应的第三方银行卡列表
         url = "%s/withdrawal/delegate/bank/list" % self._lambda_url
         params = {
@@ -104,9 +149,20 @@ class _LambdaWithdrawalKeywords():
         return(banklist)
 
     def create_delegate_bank(self,withdrawalId,custId=None):
-        #创建跟提款关联的第三方银行卡返回可用的银行卡列表（过滤掉信息不完善的银行卡）
+        """
+        【功能】：创建跟提款关联的第三方银行卡并返回可用的银行卡列表（过滤掉信息不完善的银行卡）
+
+        【参数】：
+
+        withdrawalId:提款申请id
+
+        custId:客户id，默认为空
+
+        【返回值】：无
+        """
+
         url = "%s/withdrawal/delegate/bank/create" % self._lambda_url
-        data =      {
+        data ={
                 "accountName": 'test_new',
                 "cardNo": '384750923840293',  # 银行帐号
                 "preIdno": '394758092384302955',  # 身份证号码
@@ -134,8 +190,13 @@ class _LambdaWithdrawalKeywords():
     def get_withdrawal_account(self, withdrawalId):
 
         """
+        【功能】：获取提款对应的支付对象列表数据
+
+        【参数】：
+
         withdrawalId:提款申请id
-        功能：获取提款对应的支付对象列表数据
+
+        【返回值】：返回提款的支付对象列表数据
         """
 
         url = "%s/withdrawal/pay/account/list" % self._lambda_url
@@ -151,7 +212,14 @@ class _LambdaWithdrawalKeywords():
             statusDesc = json.loads(res.content.decode()).get('statusDesc')
             raise Exception('获取提款对应的支付对象列表数据失败：%s' %statusDesc)
 
-    def get_custBank(custId):
+    def get_custBank(self,custId):
+        """
+        【功能】：获取客户银行卡列表数据，<接口应该放在客户模块>
+
+        【参数】：客户id
+
+        【返回值】：返回可用的银行卡列表（过滤掉信息不完善的银行卡）
+        """
         url = "%s/cust/bank/accounts/list" % self._lambda_url
         """
         params = {"accountype":accountype,
@@ -179,10 +247,18 @@ class _LambdaWithdrawalKeywords():
     # 新建支付对象
     def add_withdrawal_account(self,details,custId,payName=None,payType=None,payAmt=1000,Duration=None):
         """
-        payName:支付对象
-        payType:支付对象的客户类型——GR,QY
-        payAmt：支付金额
-        Duration：期限
+        【功能】：为提款新建支付对象
+
+        【参数】：
+        payName:支付对象名称，默认为空
+
+        payType:支付对象的客户类型——GR,QY，默认为空
+
+        payAmt：支付金额，默认为1000
+
+        Duration：期限，如果为空，则默认一次付清为120天，其他还款方式为4个月
+
+        【返回值】：返回新添加的支付对象的支付金额
         """
         # 提款申请支付对象提交
         withdrawalId = details['withdrawalId']
@@ -195,7 +271,7 @@ class _LambdaWithdrawalKeywords():
         else:
             if payName is not None:
                 if payType == 'GR' or payType == 'QY':
-                    custId = self.get_custid(payName,payType)
+                    custId = self.withdrawal_get_custid(payName,payType)
                     banklist = self.get_delegate_bank(withdrawalId, custId)  # 获取跟提款关联的第三方银行卡列表
                     if len(banklist) == 0:  # 如果第三方银行卡列表为空则新建一张银行卡再重新获取列表
                         self.create_delegate_bank(withdrawalId, custId)
@@ -218,7 +294,7 @@ class _LambdaWithdrawalKeywords():
                 Duration = '4'#其他还款方式，期限为4 月
 
         url = "%s/withdrawal/pay/account/save" % self._lambda_url
-        data =   {
+        data ={
                 "bankId":bankid,
                 "custId":custId,#支付对象的custId
                 "custName":custName,#支付对象的名字
@@ -240,13 +316,24 @@ class _LambdaWithdrawalKeywords():
     # withdrawal_id 提款申请的id
     def save_withdrawal_apply(self,detailId,Amt,detainPeriod=0,adInPayType='FKQ',adMgnPayType='FKQ',SerPayType='FKQ',depPayType='KCYE',repayType='XXHB',chargeOffAct='CFNC'):
         """
+        【功能】：保存提款详情
+
+        【参数】：
         detainPeriod：预扣利息期数，默认0,
+
         adInPayType:预扣利息缴交方式，默认'FKQ',
+
         adMgnPayType：预扣管理费缴交方式，默认'FKQ',
+
         SerPayType：服务费缴交方式，默认'FKQ',
+
         depPayType：保证金缴交方式，默认'KCYE',
+
         repayType:还款方式，默认'XXHB',
+
         chargeOffAct：合同性质，默认'CFNC'
+
+        【返回值】：无
         """
         #保存提款详情
         url = "%s/withdrawal/apply/save" % self._lambda_url
@@ -277,6 +364,14 @@ class _LambdaWithdrawalKeywords():
 
     
     def submit_withdrawal_apply(self, withdrawalId):
+        """
+        【功能】：提交提款申请
+
+        【参数】：
+        withdrawalId: 提款申请id
+
+        【返回值】：无
+        """
         # 提交提款申请
         url = "%s/withdrawal/apply/submit" % self._lambda_url
         data = {
@@ -293,6 +388,15 @@ class _LambdaWithdrawalKeywords():
     
         
     def get_withdrawal_taskId(self,bizCode):
+        """
+        【功能】：获取提款申请的任务id
+
+        【参数】：
+
+        bizCode: 提款编号
+
+        【返回值】：返回提款任务id
+        """
         #通过业务编号获取taskId
         url = "%s/workbench/withdrawalApply/todoList" % self._lambda_url
         data =   {
@@ -323,7 +427,15 @@ class _LambdaWithdrawalKeywords():
 
     
     def receive_withdrawal_task(self,taskId):
-        #领取任务
+        """
+        【功能】：领取提款任务
+
+        【参数】：
+
+        taskId:任务id
+
+        【返回值】：无
+        """
         url = "%s/workbench/withdrawalApply/claim" % self._lambda_url
         
         data = {
@@ -342,6 +454,19 @@ class _LambdaWithdrawalKeywords():
 
     #保存审核意见
     def save_withdrawal_advice(self,taskId,withdrawalId,detailId):
+        """
+        【功能】：保存提款审核意见
+
+        【参数】：
+
+        taskId:任务id
+
+        withdrawalId:提款申请id
+
+        detailId:提款明细id
+
+        【返回值】：无
+        """
         url = "%s/withdrawal/save" % self._lambda_url
         data = {
             "withdrawalId":withdrawalId,
@@ -362,6 +487,17 @@ class _LambdaWithdrawalKeywords():
     # 提款申请审批通过
     # withdrawal_id: 提款申请id
     def withdrawal_apply_pass(self,taskId,withdrawal_id):
+        """
+        【功能】：提款审批通过
+
+        【参数】：
+
+        taskId:提款任务id
+
+        withdrawal_id:提款申请id
+
+        【返回值】：无
+        """
         url = "%s/withdrawal/apply/pass" % self._lambda_url
         data = {
             "taskId":taskId,
@@ -376,7 +512,16 @@ class _LambdaWithdrawalKeywords():
             raise Exception("审批通过报错：%s" %statusDesc)
         
     def get_withdrawal_iou(self,withdrawalId):
-        #获取提款申请借据拆分中的借据列表
+        """
+        【功能】：获取提款申请借据拆分中的借据列表
+
+        【参数】：
+
+        withdrawalId: 提款申请id
+
+        【返回值】：返回剩余可拆分金额和借据列表
+        """
+
         url = "%s/iou/list" % self._lambda_url
         params = {
             "withdrawalId":withdrawalId
@@ -392,11 +537,19 @@ class _LambdaWithdrawalKeywords():
             raise Exception("获取提款的借据列表失败：%s" % statusDesc)
     def create_withdrawal_iou(self,iouAmt,loanDuration,withdrawalId):
         """
-        功能：拆分借据
+        【功能】：拆分借据
+
+        【参数】：
+
         iouAmt:借据金额
+
         loanDuration:借据期限
+
         payAccountId:支付对象的id，从支付对象列表中选
+
         withdrawalId:对应的提款申请Id
+
+        【返回值】：返回剩余可拆分金额
         """
         ids = []
         account_list = self.get_withdrawal_account(withdrawalId)
