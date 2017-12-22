@@ -5,13 +5,13 @@ from lambda_encrpt import LambdaEncrpt
 封装操作lambda 数据库的相关方法 
 '''
 class LambdaDbCon():
-    
-    def __init__(self,host,env='lambda_test'):
-        self.db_host=host
-        self.db_user='GreatTeam'
-        self.db_passwd='Tapd!%!^'
-        self.db_port=9527
-        self.db_charset="utf8"
+
+    def __init__(self,lambda_db_host,lambda_db_user,lambda_db_passwd,lambda_db_port,lambda_db_charset,env='lambda_test'):
+        self.db_host = lambda_db_host
+        self.db_user = lambda_db_user
+        self.db_passwd = lambda_db_passwd
+        self.db_port = lambda_db_port
+        self.db_charset = lambda_db_charset
         self.env = env
         self.connect = pymysql.connect(host=self.db_host, user=self.db_user, passwd=self.db_passwd, 
                                     port=self.db_port,charset=self.db_charset)

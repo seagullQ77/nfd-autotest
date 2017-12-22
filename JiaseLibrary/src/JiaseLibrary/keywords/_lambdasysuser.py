@@ -3,10 +3,9 @@ import json
 import hashlib
 from robot.api import logger
 from warnings import catch_warnings
-from JiaseLibrary.utils.lambda_db import LambdaDbCon
+from utils.lambda_db import LambdaDbCon
 
-
-class _LambdaSysUserKeywords():c
+class _LambdaSysUserKeywords():
     
     
     def __init__(self):      

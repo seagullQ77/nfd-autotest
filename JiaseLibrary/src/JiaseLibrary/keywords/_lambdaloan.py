@@ -10,10 +10,6 @@ class _LambdaLoanKeywords():
     def __init__(self):
         pass
 
-    def mysql(self):
-        self.db = LambdaDbCon(self._lambda_host)
-        return self.db
-
     def query_custom_info(self,cust_name, cust_type):
         '''
         根据客户名称与客户类型查询客户信息
@@ -273,7 +269,7 @@ class _LambdaLoanKeywords():
             logger.info('新增授信成功')
             loan_apply_id = ret.get('data').get('id')
             sql = "SELECT COUNT(*) FROM loan_credit_apply WHERE id='%s' AND cust_id='%s'" %(loan_apply_id,cust_id)
-            self.db = LambdaDbCon(self._lambda_host)
+            self.db = LambdaDbCon(self._lambda_db_host,self._lambda_db_user,self._lambda_db_passwd,self._lambda_db_port,self._lambda_db_charset)
             db_check_flag = self.db.check_db(sql)
             if db_check_flag == 0:
                 logger.info('新增授信数据库验证成功')
@@ -304,7 +300,7 @@ class _LambdaLoanKeywords():
             logger.info('生成授信明细id成功')
             loan_detail_id = ret.get('data').get('id')
             sql = "SELECT count(*) FROM loan_credit_detail WHERE cust_id ='%s' AND loan_apply_id='%s' AND id='%s'" %(cust_id,loan_apply_id,loan_detail_id)
-            self.db = LambdaDbCon(self._lambda_host)
+            self.db = LambdaDbCon(self._lambda_db_host,self._lambda_db_user,self._lambda_db_passwd,self._lambda_db_port,self._lambda_db_charset)
             db_check_flag = self.db.check_db(sql)
             if db_check_flag == 0:
                 logger.info('新增授信明细数据库验证成功')
@@ -399,7 +395,7 @@ class _LambdaLoanKeywords():
                 logger.info('更新账户约定成功')
                 sql = "SELECT COUNT(*) FROM contract_agreement  WHERE id='%s' AND loan_apply_id='%s' AND loan_detail_id='%s' AND cust_id='%s' AND bank_id='%s' and apply_type='%s'" \
                         % (str(agreement_id),str(loan_apply_id),str(loan_detail_id),str(cust_id),str(bank_id),str(apply_type))
-                self.db = LambdaDbCon(self._lambda_host)
+                self.db = LambdaDbCon(self._lambda_db_host,self._lambda_db_user,self._lambda_db_passwd,self._lambda_db_port,self._lambda_db_charset)
                 db_check_flag = self.db.check_db(sql)
                 if db_check_flag == 0:
                     logger.info('新增授信明细数据库验证成功')
@@ -646,7 +642,7 @@ class _LambdaLoanKeywords():
                     loan_purpose_type,
                     loan_payment_mode
                     )
-            self.db = LambdaDbCon(self._lambda_host)
+            self.db = LambdaDbCon(self._lambda_db_host,self._lambda_db_user,self._lambda_db_passwd,self._lambda_db_port,self._lambda_db_charset)
             db_check_flag = self.db.check_db(sql)
             if db_check_flag == 0:
                 logger.info('保存自贷额度数据库验证成功')
@@ -910,8 +906,13 @@ class _LambdaLoanKeywords():
         #审核意见
         if is_approved == 'Y' or is_approved == 'y':
             loan_detail_id_list = self.loan_detail_id_list_query(loan_apply_id)
-            for loan_detail_id in loan_detail_id_list:
-                self.loan_advice(loan_detail_id, is_approved=random.choice(['1','0']))
+            loan_detail_num = len(loan_detail_id_list)
+
+            for i,loan_detail_id in enumerate(loan_detail_id_list):
+                if i == 0:
+                    self.loan_advice(loan_detail_id, is_approved='1')
+                else:
+                    self.loan_advice(loan_detail_id, is_approved=random.choice(['1','0']))
 
         url = '%s/loan/apply/pass' % self._lambda_url
         payload =   {
@@ -1059,6 +1060,8 @@ class _LambdaLoanKeywords():
             score -= point_score
             
         score = round(score, 1)
+        if score < 0:
+            score = 0
 
         url = '%s/loan/advice/save' % self._lambda_url
         payload =   {
