@@ -29,9 +29,10 @@ class JiaseLibrary(
 
     def __init__(self):
         self._init_request_arg()
-        self._faker   = Factory.create(locale='zh_CN')        
+        self._faker   = Factory.create(locale='zh_CN')
         self._get_config_lambda()
-        
+        self.db = LambdaDbCon(self._lambda_host)
+
     def _get_config_lambda(self):
         cf = configparser.ConfigParser()
         cf.read(CONF_PATH,encoding='utf-8')
@@ -62,7 +63,9 @@ class JiaseLibrary(
 
 
 if __name__ == '__main__':
+
     jiase = JiaseLibrary()
+<<<<<<< Updated upstream
 
 
     #jiase.login_lambda(role='lambda_invest_manager')#投资经理登录
@@ -103,3 +106,41 @@ if __name__ == '__main__':
     jiase.withdrawal_apply_pass(taskId,withdrawalId)
     """
     # jiase.add_lambda_user(branch_name=u'投资发展六部',dept_name=u'市场部',position_name=u'投资经理岗',role_name=u'投资经理')
+=======
+    jiase.login_lambda(role='lambda_invest_manager')
+
+    # 生成授信
+    loan_apply_id = jiase.loan_apply_create('yj_个人8', 'GR')
+
+    # 生成授信明细
+    loan_detail_id1 = jiase.loan_apply_prepare_create(loan_apply_id, 'yj_个人8','GR')
+    jiase.loan_detail_self_save(loan_apply_id, loan_detail_id1,'yjtest_种植贷',self_limit='100000')
+    jiase.loan_detail_guarantor_save(loan_apply_id, loan_detail_id1,'yjtest_种植贷',guarantee_limit='50000')
+
+    # loan_detail_id2 = jiase.loan_apply_prepare_create(loan_apply_id, 'yj_个人8','GR')
+    # jiase.loan_detail_self_save(loan_apply_id, loan_detail_id1,'yjtest_经销商贷',self_limit='100000')
+    # jiase.loan_detail_guarantor_save(loan_apply_id, loan_detail_id1,'yjtest_经销商贷',guarantee_limit='50000')
+
+    # loan_detail_id3 = jiase.loan_apply_prepare_create(loan_apply_id, 'yj_个人8','GR')
+    # jiase.loan_detail_self_save(loan_apply_id, loan_detail_id1,'yjtest_美女贷',self_limit='100000')
+    # jiase.loan_detail_guarantor_save(loan_apply_id, loan_detail_id1,'yjtest_美女贷',guarantee_limit='50000')
+
+
+    # 投资经理提交授信申请
+    jiase.loan_apply_submit(loan_apply_id)
+    #
+    # 投资总监处理
+    jiase.login_lambda(role='lambda_invest_major')
+    jiase.loan_apply_pass(loan_apply_id,is_claim='Y',is_approved='Y')
+
+    # 内审处理
+    jiase.login_lambda(role='lambda_inner_audit')
+    jiase.loan_apply_pass(loan_apply_id,is_claim='Y',is_approved='Y',candidate_group=['一级审批岗'])
+
+    # 初审处理
+    jiase.login_lambda(role='lambda_audit_1')
+    jiase.loan_apply_pass(loan_apply_id,is_claim='Y',is_approved='Y')
+
+
+
+>>>>>>> Stashed changes

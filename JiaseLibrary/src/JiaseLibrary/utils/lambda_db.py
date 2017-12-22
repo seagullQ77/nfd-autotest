@@ -17,7 +17,24 @@ class LambdaDbCon():
                                     port=self.db_port,charset=self.db_charset)
         self.cursor = self.connect.cursor()
         self.lambda_encrpt = LambdaEncrpt(env)
-          
+
+    def check_db(self,sql):
+        '''
+        查询数据库中是否存在对应的记录
+        sql以 SELECT COUNT(*) 进行查询满足条件的记录数
+        :param sql:
+        :return:0:成功/1:失败
+        '''
+        self.connect.select_db('lambda')
+        self.cursor.execute(sql)
+        value = self.cursor.fetchone()[0]
+        self.cursor.close()
+        self.connect.close()
+        if value == 1:
+            return 0
+        else:
+            return 1
+
     def update_sys_user_password(self,account):       
         self.connect.select_db('lambda')
         en_account = self.lambda_encrpt._encrypt(account)
@@ -29,6 +46,7 @@ class LambdaDbCon():
         self.connect.close()
 
 if __name__ == '__main__':
-    testdb =  LambdaDbCon('10.1.60.57')
-    testdb.update_sys_user_password('15228585245')
+    testdb =  LambdaDbCon('10.1.60.107')
+    # testdb.update_sys_user_password('15228585245')
+    testdb.check_sql("select count(*) from sys_user WHERE  real_name ='admin1'")
     
