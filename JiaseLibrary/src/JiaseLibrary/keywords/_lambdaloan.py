@@ -280,13 +280,17 @@ class _LambdaLoanKeywords():
             raise AssertionError('新增授信失败,错误码:%s,错误信息: %s' % (ret.get('statusCode'), ret.get('statusDesc')))
 
 
-    def loan_apply_prepare_create(self,loan_apply_id, cust_name,cust_type):
+    def loan_apply_prepare_create(self,loan_apply_id):
         '''
         生成授信明细id
         :param loan_apply_id:授信id
         :param cust_id:客户id
         :return:授信明细id
         '''
+        loan_apply_cust_info = self.loan_apply_cust_info_query(loan_apply_id)
+        cust_name = loan_apply_cust_info.get('cust_name')
+        cust_type = loan_apply_cust_info.get('cust_type')
+
         cust_info = self.query_custom_info(cust_name, cust_type)
         cust_id = cust_info.get('baseInfo').get('id')
         url = '%s/loan/credit/details/prepare_create' % self._lambda_url

@@ -74,18 +74,18 @@ if __name__ == '__main__':
     jiase.login_lambda(role='lambda_invest_manager')
 
     # 生成授信
-    loan_apply_id = jiase.loan_apply_create('yj_企业8', 'QY')
+    loan_apply_id = jiase.loan_apply_create('yj_企业9', 'QY')
 
     # 生成授信明细
-    loan_detail_id1 = jiase.loan_apply_prepare_create(loan_apply_id, 'yj_个人9','GR')
+    loan_detail_id1 = jiase.loan_apply_prepare_create(loan_apply_id)
     jiase.loan_detail_self_save(loan_apply_id, loan_detail_id1,'yjtest_种植贷',self_limit='100000')
     jiase.loan_detail_guarantor_save(loan_apply_id, loan_detail_id1,'yjtest_种植贷',guarantee_limit='50000')
 
-    # loan_detail_id2 = jiase.loan_apply_prepare_create(loan_apply_id, 'yj_个人8','GR')
+    # loan_detail_id2 = jiase.loan_apply_prepare_create(loan_apply_id)
     # jiase.loan_detail_self_save(loan_apply_id, loan_detail_id1,'yjtest_经销商贷',self_limit='100000')
     # jiase.loan_detail_guarantor_save(loan_apply_id, loan_detail_id1,'yjtest_经销商贷',guarantee_limit='50000')
 
-    # loan_detail_id3 = jiase.loan_apply_prepare_create(loan_apply_id, 'yj_个人8','GR')
+    # loan_detail_id3 = jiase.loan_apply_prepare_create(loan_apply_id)
     # jiase.loan_detail_self_save(loan_apply_id, loan_detail_id1,'yjtest_美女贷',self_limit='100000')
     # jiase.loan_detail_guarantor_save(loan_apply_id, loan_detail_id1,'yjtest_美女贷',guarantee_limit='50000')
 
