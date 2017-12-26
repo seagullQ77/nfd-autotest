@@ -4,18 +4,36 @@ from robot.api import logger
 from _lambdasysauth import _LambdaSysAuthKeywords
 
 class _LambdaRepaymentKeywords():
-    
     def __init__(self):        
         self.lambda_sys_auth = _LambdaSysAuthKeywords()
-    
 
     # 新增还款申请
-    # lend_code:借据号
+    # lend_code:借据号IOU2017112300002
     # issue:期数
-    def _create_repayment_apply(self,lend_code=None,issue=None):
-        return repayment_id
-    
-    # 保存还款申请
+    def _create_repayment_apply(self, lend_code, custId, custKind):
+         url = '%s/repayment/apply/create' % self._lambda_url
+         param = {
+             "lend_code": lend_code,
+             "custId": custId,
+             "custKind" : custKind
+         }
+         res = self._request.post(url, headers=self._headers, data=json.dumps(param))
+         response = res.content.decode('utf-8')
+         # 把服务器返回的内容转换为python的字典
+         reply_json_dict = json.loads(response)
+         # 通过字典获取状态码
+         statusCode = reply_json_dict['statusCode']
+         statusDesc = reply_json_dict['statusDesc']
+
+         if statusCode == '0':
+             id = reply_json_dict['data']['id']
+             return id
+         else:
+             logger.info(statusDesc)
+             raise AssertionError('新增还款失败,错误码:%s,错误信息:%s' %  (reply_json_dict.get('statusCode'), reply_json_dict.get('statusDesc')))
+
+
+     # 保存还款申请
     # repayment_id 还款申请的id
     def _save_repayment_apply(self,repayment_id):
         pass
