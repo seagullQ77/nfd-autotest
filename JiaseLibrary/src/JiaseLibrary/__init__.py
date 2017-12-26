@@ -50,7 +50,8 @@ class JiaseLibrary(
         self._lambda_super_admin            = cf.get('lambda_roles','lambda_super_admin')           
         self._lambda_admin                  = cf.get('lambda_roles','lambda_admin')                 
         self._lambda_invest_manager         = cf.get('lambda_roles','lambda_invest_manager')        
-        self._lambda_invest_major           = cf.get('lambda_roles','lambda_invest_major')          
+        self._lambda_invest_major           = cf.get('lambda_roles','lambda_invest_major')
+        self._lambda_invest_develop         = cf.get('lambda_roles', 'lambda_invest_develop')
         self._lambda_inner_audit            = cf.get('lambda_roles','lambda_inner_audit')           
         self._lambda_audit_1                = cf.get('lambda_roles','lambda_audit_1')               
         self._lambda_audit_2                = cf.get('lambda_roles','lambda_audit_2')               
@@ -58,10 +59,17 @@ class JiaseLibrary(
         self._lambda_financial_review_audit = cf.get('lambda_roles','lambda_financial_review_audit')
         self._lambda_loans_a                = cf.get('lambda_roles','lambda_loans_a')               
         self._lambda_loans_b                = cf.get('lambda_roles','lambda_loans_b')               
-        self._lambda_finance_director       = cf.get('lambda_roles','lambda_finance_director')      
+        #self._lambda_finance_director       = cf.get('lambda_roles','lambda_finance_director')
         self._lambda_repay_match            = cf.get('lambda_roles','lambda_repay_match')           
         self._lambda_meeting_audit          = cf.get('lambda_roles','lambda_meeting_audit')
         self._lambda_db_env                 = cf.get('lambda_db_decryption', 'lambda_db_env')
+
+        self._lambda_management_after_loan_major        = cf.get('lambda_roles', 'lambda_management_after_loan_major')
+        self._lambda_risk_management                    = cf.get('lambda_roles', 'lambda_risk_management')
+        self._lambda_financial_clearing_director        = cf.get('lambda_roles', 'lambda_financial_clearing_director')
+        self._lambda_chief_financial_officer            = cf.get('lambda_roles', 'lambda_chief_financial_officer')
+        self._lambda_fund_clearing_post                 = cf.get('lambda_roles', 'lambda_fund_clearing_post')
+
 
     def _init_request_arg(self):
         self._request = requests.session()
@@ -71,9 +79,54 @@ if __name__ == '__main__':
 
     jiase = JiaseLibrary()
 
-    jiase.login_lambda(role='lambda_invest_manager')#投资经理登录
+    #合同签订
+    # jiase.login_lambda(role='lambda_invest_manager')#投资经理登录
     #jiase.sign_loan_contract(88)
+
+    """
+    #提前还款申请
+    jiase.login_lambda(role='lambda_invest_manager')#投资经理登录
     jiase.submit_prepay_apply(lend_code='IOU2017110300021',acc_entry_date='2017/12/30')
+
+    #提前还款审批
+    jiase.login_lambda(role='lambda_invest_major')
+    jiase.prepay_apply_aduit_pass(71,"Y")
+    #jiase.prepay_apply_aduit_back(71, "Y")
+
+    jiase.login_lambda(role='lambda_invest_develop')
+    jiase.prepay_apply_aduit_pass(71, "Y")
+    #jiase.prepay_apply_aduit_back(71,"Y")
+    
+    """
+    #减免利息:财务清算总监——>财务总监
+    jiase.login_lambda(role='lambda_financial_clearing_director')
+    jiase.prepay_apply_aduit_pass(71,"Y")
+    #jiase.prepay_apply_aduit_back(71, "Y")
+    jiase.login_lambda(role='lambda_chief_financial_officer')
+    jiase.prepay_apply_aduit_pass(71,"Y")
+    #jiase.prepay_apply_aduit_back(71, "Y")
+
+    #减免违约金：贷后管理部总监——>风险管理部负责人
+    jiase.login_lambda(role='lambda_management_after_loan_major')
+    jiase.prepay_apply_aduit_pass(71, "Y")
+    #jiase.prepay_apply_aduit_back(71, "Y")
+    jiase.login_lambda(role='lambda_risk_management')
+    jiase.prepay_apply_aduit_pass(71, "Y")
+    #jiase.prepay_apply_aduit_back(71, "Y")
+
+    #资金清算岗——>财务复核岗
+    jiase.login_lambda(role='lambda_fund_clearing_post')
+    #self.prepay_apply_aduit_pass(71, "Y", 'lambda_fund_clearing_post', prepay_info[0], prepay_info[1])
+    #jiase.prepay_apply_aduit_back(71, "Y")
+    #self.prepay_apply_aduit_pass(71, "Y", 'lambda_financial_review_audit', prepay_info[0], prepay_info[1])
+    jiase.prepay_apply_aduit_pass(71, "Y")
+    #jiase.prepay_apply_aduit_back(71, "Y")
+
+
+
+
+
+
 
     #jiase.add_custom_personal(cust_kind='DKKH')
     #jiase.add_loan()
