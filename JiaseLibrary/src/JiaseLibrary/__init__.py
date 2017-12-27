@@ -83,6 +83,11 @@ if __name__ == '__main__':
     # jiase.login_lambda(role='lambda_invest_manager')#投资经理登录
     #jiase.sign_loan_contract(88)
 
+
+    #IOU2017110200023  IOU2017110200022  IOU2017110200021
+
+    #jiase.prepay_approval_workflow("IOU2017110200021", "2018/01/10","TQJQ",0,0,1,1,1)
+
     """
     #提前还款申请
     jiase.login_lambda(role='lambda_invest_manager')#投资经理登录
@@ -97,7 +102,6 @@ if __name__ == '__main__':
     jiase.prepay_apply_aduit_pass(71, "Y")
     #jiase.prepay_apply_aduit_back(71,"Y")
     
-    """
     #减免利息:财务清算总监——>财务总监
     jiase.login_lambda(role='lambda_financial_clearing_director')
     jiase.prepay_apply_aduit_pass(71,"Y")
@@ -105,25 +109,29 @@ if __name__ == '__main__':
     jiase.login_lambda(role='lambda_chief_financial_officer')
     jiase.prepay_apply_aduit_pass(71,"Y")
     #jiase.prepay_apply_aduit_back(71, "Y")
-
+    
+    
     #减免违约金：贷后管理部总监——>风险管理部负责人
     jiase.login_lambda(role='lambda_management_after_loan_major')
-    jiase.prepay_apply_aduit_pass(71, "Y")
+    jiase.prepay_apply_aduit_pass(85, "Y",'lambda_management_after_loan_major')
     #jiase.prepay_apply_aduit_back(71, "Y")
     jiase.login_lambda(role='lambda_risk_management')
-    jiase.prepay_apply_aduit_pass(71, "Y")
+    jiase.prepay_apply_aduit_pass(85, "Y",'lambda_risk_management')
     #jiase.prepay_apply_aduit_back(71, "Y")
-
+    
     #资金清算岗——>财务复核岗
+
     jiase.login_lambda(role='lambda_fund_clearing_post')
-    #self.prepay_apply_aduit_pass(71, "Y", 'lambda_fund_clearing_post', prepay_info[0], prepay_info[1])
+    #jiase.prepay_apply_aduit_pass(85, "Y", 'lambda_fund_clearing_post', "1047.12", "2018/01/08")
+    jiase.prepay_apply_aduit_reject(85, "Y", 'lambda_fund_clearing_post', "1047.12", "2018/01/08")
+    
+
+    jiase.login_lambda(role='lambda_financial_review_audit')
+    jiase.prepay_apply_aduit_back(85, "Y", 'lambda_financial_review_audit', "1047.12", "2018/01/08")
     #jiase.prepay_apply_aduit_back(71, "Y")
-    #self.prepay_apply_aduit_pass(71, "Y", 'lambda_financial_review_audit', prepay_info[0], prepay_info[1])
-    jiase.prepay_apply_aduit_pass(71, "Y")
-    #jiase.prepay_apply_aduit_back(71, "Y")
 
 
-
+   """
 
 
 
