@@ -28,8 +28,9 @@ class _LambdaRepaymentKeywords():
          statusDesc = reply_json_dict['statusDesc']
 
          if statusCode == '0':
-             id = reply_json_dict['data']['id']
-             return id
+             data = reply_json_dict['data']
+          #返回data,为后面的保存还款申请获取数据做准备
+             return data
          else:
              logger.info(statusDesc)
              raise AssertionError('新增还款失败,错误码:%s,错误信息:%s' %  (reply_json_dict.get('statusCode'), reply_json_dict.get('statusDesc')))
@@ -37,9 +38,37 @@ class _LambdaRepaymentKeywords():
 
      # 保存还款申请
     # repayment_id 还款申请的id
-    def _save_repayment_apply(self,repayment_id):
-        pass
-    
+    def _save_repayment_apply(self,create_data,receivedFundDate,inputAmt,):
+        # 参数验证
+        if receivedFundDate is None or inputAmt is None:
+            raise Exception('请完善还款金额信息')
+        url = '%s/repayment/apply/save' % self._lambda_url
+        param = {
+            "repayment_id":create_data['id'] ,
+            "tradeType": create_data['tradeType'],
+            "tradeChannel": create_data['tradeChannel'],
+            "cardNo": create_data['cardNo'],
+            "receivedFundDate": receivedFundDate,
+            "repayOrder": create_data['repayOrder'],
+            "inputAmt": inputAmt,
+            "remark": create_data['remark']
+        }
+        res = self._request.post(url, headers=self._headers, data=json.dumps(param))
+        response = res.content.decode('utf-8')
+        # 把服务器返回的内容转换为python的字典
+        reply_json_dict = json.loads(response)
+        # 通过字典获取状态码
+        statusCode = reply_json_dict['statusCode']
+        statusDesc = reply_json_dict['statusDesc']
+
+        if statusCode == '0':
+            logger.info("保存成功！statusCode: %s, statusDesc: %s" % (reply_json_dict.get('statusCode'), reply_json_dict.get('statusDesc')))
+            return 0
+        else:
+            raise Exception('保存还款失败,错误码:%s,错误信息:%s' % (reply_json_dict.get('statusCode'), reply_json_dict.get('statusDesc')))
+
+
+
     # 提交还款申请
     # lend_code:借据号
     # issue:期数
