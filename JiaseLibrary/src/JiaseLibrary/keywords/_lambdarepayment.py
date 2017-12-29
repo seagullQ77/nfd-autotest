@@ -4,8 +4,6 @@ from robot.api import logger
 import datetime
 from datetime import date
 
-
-
 class _LambdaRepaymentKeywords():
     
     def __init__(self):
