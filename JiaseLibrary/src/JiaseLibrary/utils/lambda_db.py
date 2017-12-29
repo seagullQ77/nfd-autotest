@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import pymysql
-from lambda_encrpt import LambdaEncrpt
+from utils.lambda_encrpt import LambdaEncrpt
 '''
 封装操作lambda 数据库的相关方法 
 '''
@@ -18,7 +18,7 @@ class LambdaDbCon():
         self.cursor = self.connect.cursor()
         self.lambda_encrpt = LambdaEncrpt(env)
 
-    def check_db(self,sql):
+    def check_db(self,sql,value=1):
         '''
         查询数据库中是否存在对应的记录
         sql以 SELECT COUNT(*) 进行查询满足条件的记录数
@@ -27,13 +27,13 @@ class LambdaDbCon():
         '''
         self.connect.select_db('lambda')
         self.cursor.execute(sql)
-        value = self.cursor.fetchone()[0]
+        db_value = self.cursor.fetchone()[0]
         self.cursor.close()
         self.connect.close()
-        if value == 1:
-            return 0
+        if db_value == value:
+            return True
         else:
-            return 1
+            return False
 
     def update_sys_user_password(self,account):       
         self.connect.select_db('lambda')

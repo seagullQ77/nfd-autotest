@@ -3,8 +3,16 @@
 import os
 import requests
 import configparser
-from keywords import *
-from utils import *
+from keywords._lambdasysauth import _LambdaSysAuthKeywords
+from keywords._lambdasysorganize import _LambdaSysOrganizeKeywords
+from keywords._lambdasysuser import _LambdaSysUserKeywords
+from keywords._lambdacustomer import _LambdaCustomerKeywords
+from keywords._lambdaloan import _LambdaLoanKeywords
+from keywords._lambdacontract  import _LambdaContractKeywords
+from keywords._lambdawithdrawal import _LambdaWithdrawalKeywords
+from keywords._lambdarepayment import _LambdaRepaymentKeywords
+from utils.lambda_db import LambdaDbCon
+from utils.lambda_encrpt import LambdaEncrpt
 from version import VERSION
 from faker.factory import Factory
 
@@ -78,134 +86,49 @@ class JiaseLibrary(
 if __name__ == '__main__':
 
     jiase = JiaseLibrary()
-
-    #合同签订
-    # jiase.login_lambda(role='lambda_invest_manager')#投资经理登录
-    #jiase.sign_loan_contract(88)
-
-
-    #IOU2017110200023  IOU2017110200022  IOU2017110200021
-
-    #jiase.prepay_approval_workflow("IOU2017110200021", "2018/01/10","TQJQ",0,0,1,1,1)
-
-    """
-    #提前还款申请
     jiase.login_lambda(role='lambda_invest_manager')#投资经理登录
-    jiase.submit_prepay_apply(lend_code='IOU2017110300021',acc_entry_date='2017/12/30')
-
-    #提前还款审批
-    jiase.login_lambda(role='lambda_invest_major')
-    jiase.prepay_apply_aduit_pass(71,"Y")
-    #jiase.prepay_apply_aduit_back(71, "Y")
-
-    jiase.login_lambda(role='lambda_invest_develop')
-    jiase.prepay_apply_aduit_pass(71, "Y")
-    #jiase.prepay_apply_aduit_back(71,"Y")
-    
-    #减免利息:财务清算总监——>财务总监
-    jiase.login_lambda(role='lambda_financial_clearing_director')
-    jiase.prepay_apply_aduit_pass(71,"Y")
-    #jiase.prepay_apply_aduit_back(71, "Y")
-    jiase.login_lambda(role='lambda_chief_financial_officer')
-    jiase.prepay_apply_aduit_pass(71,"Y")
-    #jiase.prepay_apply_aduit_back(71, "Y")
-    
-    
-    #减免违约金：贷后管理部总监——>风险管理部负责人
-    jiase.login_lambda(role='lambda_management_after_loan_major')
-    jiase.prepay_apply_aduit_pass(85, "Y",'lambda_management_after_loan_major')
-    #jiase.prepay_apply_aduit_back(71, "Y")
-    jiase.login_lambda(role='lambda_risk_management')
-    jiase.prepay_apply_aduit_pass(85, "Y",'lambda_risk_management')
-    #jiase.prepay_apply_aduit_back(71, "Y")
-    
-    #资金清算岗——>财务复核岗
-
-    jiase.login_lambda(role='lambda_fund_clearing_post')
-    #jiase.prepay_apply_aduit_pass(85, "Y", 'lambda_fund_clearing_post', "1047.12", "2018/01/08")
-    jiase.prepay_apply_aduit_reject(85, "Y", 'lambda_fund_clearing_post', "1047.12", "2018/01/08")
-    
-
-    jiase.login_lambda(role='lambda_financial_review_audit')
-    jiase.prepay_apply_aduit_back(85, "Y", 'lambda_financial_review_audit', "1047.12", "2018/01/08")
-    #jiase.prepay_apply_aduit_back(71, "Y")
-
-
-   """
-
-
-
-
-    #jiase.add_custom_personal(cust_kind='DKKH')
-    #jiase.add_loan()
-    """
-    # 从提款申请到审核通过，步骤如下：
-    withdrawal_detailId, custId = jiase.create_withdrawal_apply('黎华县', 'GR')
-    details, bizCode = jiase.withdrawal_apply_view(withdrawal_detailId)
-    payAmt = jiase.add_withdrawal_account(details, custId, payName='毛峰尖', payType='GR', payAmt=3000, Duration='5')
-    jiase.save_withdrawal_apply(withdrawal_detailId, payAmt)
-    withdrawalId = details['withdrawalId']  # 获取提款申请id
-    jiase.submit_withdrawal_apply(withdrawalId)
-    print("---------------------------------提款申请已经完成，下面进入审核流程---------------------------------")
-    #A岗
-    jiase.login_lambda(role='lambda_loans_a')   # 放款岗A登录
-    taskId = jiase.get_withdrawal_taskId(bizCode)
-    jiase.receive_withdrawal_task(taskId)
-    jiase.save_withdrawal_apply(withdral_detailId, payAmt)  # 保存提款详情
-    jiase.save_withdrawal_advice(taskId, withdrawalId, withdral_detailId)
-    # #运行接口发现放款岗没有手动拆借据也可以审核通过
-    totalAmt, iou_list = jiase.get_withdrawal_iou(withdrawalId)
-    if totalAmt !=0:
-        jiase.create_withdrawal_iou(totalAmt,'6',withdrawalId)
-    jiase.withdrawal_apply_pass(taskId,withdrawalId)
-    #B岗
-    jiase.login_lambda(role='lambda_loans_b')   # 放款岗B登录
-    taskId = jiase.get_withdrawal_taskId(bizCode)
-    jiase.receive_withdrawal_task(taskId)
-    jiase.save_withdrawal_apply(withdral_detailId, payAmt)  # 保存提款详情
-    jiase.save_withdrawal_advice(taskId, withdrawalId, withdral_detailId)
-    # #运行接口发现放款岗没有手动拆借据也可以审核通过
-    totalAmt = jiase.get_withdrawal_iou(withdrawalId)
-    if totalAmt !=0:
-        jiase.create_withdrawal_iou(totalAmt,'6',withdrawalId)
-    jiase.withdrawal_apply_pass(taskId,withdrawalId)
-    """
-    # jiase.add_lambda_user(branch_name=u'投资发展六部',dept_name=u'市场部',position_name=u'投资经理岗',role_name=u'投资经理')
-
-
-    #jiase.login_lambda(role='lambda_invest_manager')
 
     # 生成授信
-    loan_apply_id = jiase.loan_apply_create('yj_企业9', 'QY')
+    loan_apply_id = jiase.loan_apply_create('yj_企业7', 'QY')
 
     # 生成授信明细
     loan_detail_id1 = jiase.loan_apply_prepare_create(loan_apply_id)
     jiase.loan_detail_self_save(loan_apply_id, loan_detail_id1,'yjtest_种植贷',self_limit='100000')
     jiase.loan_detail_guarantor_save(loan_apply_id, loan_detail_id1,'yjtest_种植贷',guarantee_limit='50000')
-
-    # loan_detail_id2 = jiase.loan_apply_prepare_create(loan_apply_id)
-    # jiase.loan_detail_self_save(loan_apply_id, loan_detail_id1,'yjtest_经销商贷',self_limit='100000')
-    # jiase.loan_detail_guarantor_save(loan_apply_id, loan_detail_id1,'yjtest_经销商贷',guarantee_limit='50000')
-
-    # loan_detail_id3 = jiase.loan_apply_prepare_create(loan_apply_id)
-    # jiase.loan_detail_self_save(loan_apply_id, loan_detail_id1,'yjtest_美女贷',self_limit='100000')
-    # jiase.loan_detail_guarantor_save(loan_apply_id, loan_detail_id1,'yjtest_美女贷',guarantee_limit='50000')
-
+    # 添加担保方
+    jiase.loan_guarantors_create(loan_detail_id1, 'yj_个人1')
 
     # 投资经理提交授信申请
     jiase.loan_apply_submit(loan_apply_id)
-    #
+
     # 投资总监处理
     jiase.login_lambda(role='lambda_invest_major')
-    jiase.loan_apply_pass(loan_apply_id,is_claim='Y',is_approved='Y')
+    jiase.loan_apply_pass(loan_apply_id,is_claim='Y')
 
     # 内审处理
     jiase.login_lambda(role='lambda_inner_audit')
-    jiase.loan_apply_pass(loan_apply_id,is_claim='Y',is_approved='Y',candidate_group=['一级审批岗'])
+    jiase.loan_apply_pass(loan_apply_id,is_claim='Y',candidate_group = ['一级审批岗'])
 
-    # 初审处理
+    # 一级审批处理
     jiase.login_lambda(role='lambda_audit_1')
-    jiase.loan_apply_pass(loan_apply_id,is_claim='Y',is_approved='Y')
+    jiase.loan_apply_back(loan_apply_id,back_position='申请',is_claim='Y')
+
+    # 投资经理提交授信申请
+    jiase.login_lambda(role='lambda_invest_manager')
+    jiase.loan_apply_submit(loan_apply_id,is_next='N')
+
+    # 一级审批处理
+    jiase.login_lambda(role='lambda_audit_1')
+    jiase.loan_apply_back(loan_apply_id,back_position='申请',is_claim='Y')
+
+    # 投资经理提交授信申请
+    jiase.login_lambda(role='lambda_invest_manager')
+    jiase.loan_apply_submit(loan_apply_id,is_next='Y')
+
+
+
+
+
 
 
 

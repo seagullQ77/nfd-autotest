@@ -84,12 +84,12 @@ class _LambdaWithdrawalKeywords():
             status = json.loads(res.content.decode()).get('statusCode')
             if status == '0':
                 withdrawal_detailId = json.loads(res.content.decode()).get('data')
-                print("对%s新建提款成功，提还明细id为:%s" % (contractNo, withdrawal_detailId))
+                logger.info("对%s新建提款成功，提还明细id为:%s" % (contractNo, withdrawal_detailId))
                 # 返回提款详情id和custid
                 return withdrawal_detailId, custId
             else:
                 statusDesc = json.loads(res.content.decode()).get('statusDesc')
-                print("对%s新建提款失败%s" % (contractNo, statusDesc))
+                raise Exception("对%s新建提款失败%s" % (contractNo, statusDesc))
 
     def withdrawal_apply_view(self,apply_detailId):
         """
@@ -184,7 +184,7 @@ class _LambdaWithdrawalKeywords():
             pass
         else:
             statusDesc = json.loads(res.content.decode()).get('statusDesc')
-            print('新增第三方银行卡失败:%s' % statusDesc)
+            raise Exception('新增第三方银行卡失败:%s' % statusDesc)
             return
 
     def get_withdrawal_account(self, withdrawalId):
@@ -305,7 +305,7 @@ class _LambdaWithdrawalKeywords():
         res = self._request.post(url,data=json.dumps(data),headers=self._headers)
         status = json.loads(res.content.decode()).get('statusCode')
         if status == '0':
-            print('新增支付对象成功')
+            logger.info('新增支付对象成功')
             return data.get("payAmt")#返回支付对象金额
         else:
             statusDesc = json.loads(res.content.decode()).get('statusDesc')
@@ -314,48 +314,63 @@ class _LambdaWithdrawalKeywords():
         
     # 保存提款申请
     # withdrawal_id 提款申请的id
-    def save_withdrawal_apply(self,detailId,Amt,detainPeriod=0,adInPayType='FKQ',adMgnPayType='FKQ',SerPayType='FKQ',depPayType='KCYE',repayType='XXHB',chargeOffAct='CFNC'):
+    def save_withdrawal_apply(self,detailId,Amt,**kwargs):
         """
         【功能】：保存提款详情
 
         【参数】：
-        detainPeriod：预扣利息期数，默认0,
-
-        adInPayType:预扣利息缴交方式，默认'FKQ',
-
-        adMgnPayType：预扣管理费缴交方式，默认'FKQ',
-
-        SerPayType：服务费缴交方式，默认'FKQ',
-
-        depPayType：保证金缴交方式，默认'KCYE',
-
-        repayType:还款方式，默认'XXHB',
-
-        chargeOffAct：合同性质，默认'CFNC'
+        **kwargs
+        detainPeriod #预扣利息期数,默认0
+        adInPayType：预扣利息缴交方式(可填值为FKQ,KCYE)，默认FKQ
+        adMgntPayType：预扣管理费缴交方式(可填值为FKQ,KCYE)，默认FKQ
+        serPayType：服务费缴交方式(可填值为FKQ,KCYE)，默认FKQ
+        depPayType：保证金缴交方式(可填值为FKQ,KCYE)，默认KCYE
+        repayType：还款方式,默认XXHB
+        chargeOffAct：合同性质(可填值为NJQ,CFNC),默认为CFNC
+        depActStatus：保证金到账状态,默认TRUE
+        mgtActStatus：管理费到账状态,默认TRUE
+        serActStatus：服务费到账状态,默认TRUE
+        wInActStatus：预扣利息到账状态,默认TRUE
 
         【返回值】：无
         """
         #保存提款详情
+        #detainPeriod = 0, adInPayType = 'FKQ', adMgnPayType = 'FKQ',
+        #SerPayType = 'FKQ', depPayType = 'KCYE', repayType = 'XXHB', chargeOffAct = 'CFNC'
+        details = self.withdrawal_apply_view(detailId)[0]
+        borrowYearRate = details['borrowYearRate']
+        detainPeriod = kwargs.get('detainPeriod',details['detainPeriod'])#预扣利息期数
+        adInPayType = kwargs.get('adInPayType','FKQ')#预扣利息缴交方式
+        adMgntPayType = kwargs.get('adMgntPayType','FKQ')#预扣管理费缴交方式
+        serPayType = kwargs.get('serPayType','FKQ')#服务费缴交方式
+        depPayType = kwargs.get('depPayType','KCYE')#保证金缴交方式
+        repayType = kwargs.get('repayType',details['repaymentType'])#还款方式
+        chargeOffAct = kwargs.get('chargeOffAct','CFNC')#合同性质
+        depActStatus = kwargs.get('depActStatus','TRUE')#保证金到账状态
+        mgtActStatus = kwargs.get('mgtActStatus','TRUE')#管理费到账状态
+        serActStatus = kwargs.get('serActStatus','TRUE')#服务费到账状态
+        wInActStatus = kwargs.get('wInActStatus','TRUE')#预扣利息到账状态
         url = "%s/withdrawal/apply/save" % self._lambda_url
         data = {
                 "id": detailId,#提款详情id
-                "detainPeriod":'0', #预扣利息期数
-                "advanceInterestPaymentType":'FKQ',#预扣利息缴交方式
-                "advanceBizMgntPaymentType":'FKQ',#预扣管理费缴交方式
-                "bizServicePaymentType":'FKQ',#服务费缴交方式
-                "depositPaymentType":'KCYE',#保证金缴交方式
-                "repaymentType":'XXHB',#还款方式
-                "chargeOffAct":'CFNC',#合同性质
-                "depositToActStatus":'TRUE',#保证金到账状态
-                "mngtToActStatus":'TRUE',#管理费到账状态
-                "serviceToActStatus":'TRUE',#服务费到账状态
-                "whInterestToActStatus":'TRUE',#预扣利息到账状态
+                "detainPeriod":detainPeriod, #预扣利息期数
+                "advanceInterestPaymentType":adInPayType,#预扣利息缴交方式
+                "advanceBizMgntPaymentType":adMgntPayType,#预扣管理费缴交方式
+                "bizServicePaymentType":serPayType,#服务费缴交方式
+                "depositPaymentType":depPayType,#保证金缴交方式
+                "repaymentType":repayType,#还款方式
+                "chargeOffAct":chargeOffAct,#合同性质
+                "depositToActStatus":depActStatus,#保证金到账状态
+                "mngtToActStatus":mgtActStatus,#管理费到账状态
+                "serviceToActStatus":serActStatus,#服务费到账状态
+                "whInterestToActStatus":wInActStatus,#预扣利息到账状态
+                "borrowYearRate":borrowYearRate,
                 "withdrawalAmt":Amt #提款金额
             }
         res = self._request.post(url,data=json.dumps(data),headers=self._headers)
         status = json.loads(res.content.decode()).get('statusCode')
         if status == '0':
-            print('保存提款详情成功')
+            logger.info('保存提款详情成功')
         else:
             statusDesc = json.loads(res.content.decode()).get('statusDesc')
             #print('保存提款详情失败:%s' %statusDesc)
@@ -380,7 +395,7 @@ class _LambdaWithdrawalKeywords():
         res = self._request.post(url,data=json.dumps(data),headers=self._headers)
         status = json.loads(res.content.decode()).get('statusCode')
         if status == '0':
-            print('提交提款成功：%s' %withdrawalId)
+            logger.info('提交提款成功：%s' %withdrawalId)
         else:
             statusDesc = json.loads(res.content.decode()).get('statusDesc')
             #print('提交提款失败:%s' %statusDesc)
@@ -412,7 +427,7 @@ class _LambdaWithdrawalKeywords():
             for i in lst:
                 code = i['bizCode']
                 if code == bizCode:
-                    return i.get('taskId') #,i.get('id')  #返回taskId和提款明细id
+                    return i.get('taskId'),i.get('id')  #返回taskId和提款明细id
             else:
                 raise Exception("此用户名下不存在任务编码为%s的提款任务" %bizCode)
                 """
@@ -445,7 +460,7 @@ class _LambdaWithdrawalKeywords():
         #r = json.loads(res.content.decode())
         status = json.loads(res.content.decode()).get('statusCode')
         if status =='0':
-            print("领取任务成功")
+            logger.info("领取任务成功")
         else:
             statusDesc = json.loads(res.content.decode()).get('statusDesc')
             #print("领取任务失败：%s" %statusDesc)
@@ -478,7 +493,7 @@ class _LambdaWithdrawalKeywords():
         #r = json.loads(res.content.decode())
         status = json.loads(res.content.decode()).get('statusCode')
         if status =='0':
-            print("保存审核意见成功")
+            logger.info("保存审核意见成功")
         else:
             statusDesc = json.loads(res.content.decode()).get('statusDesc')
             #print("保存审核意见失败：%s" %statusDesc)
@@ -506,7 +521,7 @@ class _LambdaWithdrawalKeywords():
         res = self._request.post(url,data=json.dumps(data),headers = self._headers)  
         status = json.loads(res.content.decode()).get('statusCode')
         if status =='0':
-            print("审批通过")
+            logger.info("审批通过")
         else:
             statusDesc = json.loads(res.content.decode()).get('statusDesc')
             raise Exception("审批通过报错：%s" %statusDesc)
