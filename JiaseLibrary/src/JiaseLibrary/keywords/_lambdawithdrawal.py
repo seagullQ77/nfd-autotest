@@ -1,6 +1,7 @@
  # -*- coding:utf-8 -*-
 import json
 from robot.api import logger
+from utils.lambda_db import LambdaDbCon
 from faker.factory import Factory
 myfaker = Factory.create('zh_CN')
 
@@ -40,20 +41,32 @@ class _LambdaWithdrawalKeywords():
         else:
             raise Exception("系统中不存在客户名为 %s 的 %s 客户" %(custname,custtype))
 
-    def _get_contract(self,custid):
+    def _query_contractno(self,contractno):
         #通过custid获取客户已签订的合同列表
-        url = "%s/withdrawal/apply/listContract" % self._lambda_url
-        params = {"custId":custid}
+        url = "%s/contract/main/list" % self._lambda_url
+
+        params = {"contractNo":contractno,
+                  "pageSize":10
+                  }
         res = self._request.get(url,params = params)
-        response = res.content.decode()
-        list_contract = json.loads(response).get('list')
-        return list_contract
+        res_data = json.loads(res.content.decode()).get('list')
+        status = json.loads(res.content.decode()).get('statusCode')
+        if status == '0' and len(res_data) != 0:
+            custid = res_data[0].get('custId')
+            contractid = res_data[0]['id']
+            logger.info("通过合同编号%s，查询成功" %contractno)
+            # 返回提款详情id和custid
+            return contractid,custid
+        else:
+            statusDesc = json.loads(res.content.decode()).get('statusDesc')
+            raise Exception("通过合同编号%s，查询失败，或者是不存在此合同编号" %contractno)
+
 
     # 新建提款申请
     # custname:借款客户姓名
     # custtype:客户类型——GR,QY
     # 返回 withdrawal_id 后续其他接口会用到
-    def create_withdrawal_apply(self, custname, custtype):
+    def create_withdrawal_apply(self,contractno):
         """
         【功能】：新建提款申请
 
@@ -69,27 +82,27 @@ class _LambdaWithdrawalKeywords():
         """
 
         url = "%s/withdrawal/apply/create" % self._lambda_url
-        custId = self.withdrawal_get_custid(custname, custtype)
-        list_contracts = self._get_contract(custId)
-
-        for lst in list_contracts:
-            contractId = lst.get('id')
-            contractNo = lst.get('contractNo')
-            data = {
-                "contractId": contractId,
-                "custId": custId
-            }
-            res = self._request.post(url, data=data)  # webforms格式的参数
-            # r = json.loads(res.content.decode())
-            status = json.loads(res.content.decode()).get('statusCode')
-            if status == '0':
-                withdrawal_detailId = json.loads(res.content.decode()).get('data')
-                logger.info("对%s新建提款成功，提还明细id为:%s" % (contractNo, withdrawal_detailId))
-                # 返回提款详情id和custid
-                return withdrawal_detailId, custId
-            else:
-                statusDesc = json.loads(res.content.decode()).get('statusDesc')
-                raise Exception("对%s新建提款失败%s" % (contractNo, statusDesc))
+        contractId, custId = self._query_contractno(contractno)  #这个地方调用合同模块的接口，通过合同编号获取合同id和custId 等联调？？？！！！
+        data = {
+            "contractId": contractId,
+            "custId": custId
+        }
+        res = self._request.post(url, data=data)  # webforms格式的参数
+        # r = json.loads(res.content.decode())
+        status = json.loads(res.content.decode()).get('statusCode')
+        if status == '0':
+            logger.info("对%s新建提款成功，提还明细id为:%s" % (contractno, withdrawal_detailId))
+            withdrawal_detailId = json.loads(res.content.decode()).get('data')
+            sql = "SELECT * FROM `withdrawal_detail_info` WHERE id = '%s' AND withdrawal_status = 'APPLYING';" %withdrawal_detailId
+            self.db = LambdaDbCon(self._lambda_db_host,self._lambda_db_user,self._lambda_db_passwd,self._lambda_db_port,self._lambda_db_charset)
+            db_check_flag = self.db.check_db(sql)
+            if db_check_flag == 0:
+                logger.info('新增提款申请数据库验证成功')
+            # 返回提款详情id和custid
+            return withdrawal_detailId, custId
+        else:
+            statusDesc = json.loads(res.content.decode()).get('statusDesc')
+            raise Exception("对%s新建提款失败%s" % (contractno, statusDesc))
 
     def withdrawal_apply_view(self,apply_detailId):
         """
@@ -196,7 +209,7 @@ class _LambdaWithdrawalKeywords():
 
         withdrawalId:提款申请id
 
-        【返回值】：返回提款的支付对象列表数据
+        【返回值】：返回提款的支付对象
         """
 
         url = "%s/withdrawal/pay/account/list" % self._lambda_url
@@ -207,7 +220,10 @@ class _LambdaWithdrawalKeywords():
         status = json.loads(res.content.decode()).get('statusCode')
         if status == '0':
             account_list = json.loads(res.content.decode()).get('data')  # 获取提款的所有支付对象
-            return account_list
+            amt = 0
+            for i in account_list:
+                amt = amt + i.get('payAmt')
+            return account_list, amt
         else:
             statusDesc = json.loads(res.content.decode()).get('statusDesc')
             raise Exception('获取提款对应的支付对象列表数据失败：%s' %statusDesc)
@@ -306,7 +322,13 @@ class _LambdaWithdrawalKeywords():
         status = json.loads(res.content.decode()).get('statusCode')
         if status == '0':
             logger.info('新增支付对象成功')
-            return data.get("payAmt")#返回支付对象金额
+            sql = "SELECT * FROM `withdrawal_pay_account` WHERE withdrawal_id = '%s' AND pay_amt = '%s' \
+                  AND loan_duration = '%s'" %(withdrawalId,payAmt,Duration)
+            self.db = LambdaDbCon(self._lambda_db_host,self._lambda_db_user,self._lambda_db_passwd,self._lambda_db_port,self._lambda_db_charset)
+            db_check_flag = self.db.check_db(sql)
+            if db_check_flag == 0:
+                logger.info('新增支付对象的数据库验证成功')
+            #return data.get("payAmt")#返回支付对象金额
         else:
             statusDesc = json.loads(res.content.decode()).get('statusDesc')
             #print('新增支付对象失败：%s' %statusDesc)
@@ -319,18 +341,34 @@ class _LambdaWithdrawalKeywords():
         【功能】：保存提款详情
 
         【参数】：
+
         **kwargs
+
         detainPeriod #预扣利息期数,默认0
+
         adInPayType：预扣利息缴交方式(可填值为FKQ,KCYE)，默认FKQ
+
         adMgntPayType：预扣管理费缴交方式(可填值为FKQ,KCYE)，默认FKQ
+
         serPayType：服务费缴交方式(可填值为FKQ,KCYE)，默认FKQ
+
         depPayType：保证金缴交方式(可填值为FKQ,KCYE)，默认KCYE
+
         repayType：还款方式,默认XXHB
+
         chargeOffAct：合同性质(可填值为NJQ,CFNC),默认为CFNC
+
         depActStatus：保证金到账状态,默认TRUE
+
         mgtActStatus：管理费到账状态,默认TRUE
+
         serActStatus：服务费到账状态,默认TRUE
+
         wInActStatus：预扣利息到账状态,默认TRUE
+
+        inSetType = kwargs.get('inSetType','DYR')#结息方式 GDR,DYR
+
+        repayDtime = kwargs.get('repayDtime','1')#固定日还款时的还款日期设置
 
         【返回值】：无
         """
@@ -350,6 +388,8 @@ class _LambdaWithdrawalKeywords():
         mgtActStatus = kwargs.get('mgtActStatus','TRUE')#管理费到账状态
         serActStatus = kwargs.get('serActStatus','TRUE')#服务费到账状态
         wInActStatus = kwargs.get('wInActStatus','TRUE')#预扣利息到账状态
+        inSetType = kwargs.get('inSetType','DYR')#结息方式 GDR,DYR
+        repayDtime = kwargs.get('repayDtime','1')#固定日还款时的还款日期设置
         url = "%s/withdrawal/apply/save" % self._lambda_url
         data = {
                 "id": detailId,#提款详情id
@@ -364,7 +404,9 @@ class _LambdaWithdrawalKeywords():
                 "mngtToActStatus":mgtActStatus,#管理费到账状态
                 "serviceToActStatus":serActStatus,#服务费到账状态
                 "whInterestToActStatus":wInActStatus,#预扣利息到账状态
-                "borrowYearRate":borrowYearRate,
+                "interestSettlementType":inSetType,#结息方式 GDR,DYR
+                "repaymentDatetime":repayDtime,#固定日还款时的还款日期设置
+                "borrowYearRate":borrowYearRate,#借款利率，当还款方式为FDHK时，会判断这个值是否大于10.2
                 "withdrawalAmt":Amt #提款金额
             }
         res = self._request.post(url,data=json.dumps(data),headers=self._headers)
@@ -550,6 +592,7 @@ class _LambdaWithdrawalKeywords():
         else:
             statusDesc = json.loads(res.content.decode()).get('statusDesc')
             raise Exception("获取提款的借据列表失败：%s" % statusDesc)
+
     def create_withdrawal_iou(self,iouAmt,loanDuration,withdrawalId):
         """
         【功能】：拆分借据
@@ -567,7 +610,7 @@ class _LambdaWithdrawalKeywords():
         【返回值】：返回剩余可拆分金额
         """
         ids = []
-        account_list = self.get_withdrawal_account(withdrawalId)
+        account_list = self.get_withdrawal_account(withdrawalId)[0]
         for i in account_list:
             ids.append(i['id'])
         url = "%s/iou/create" % self._lambda_url
@@ -583,30 +626,74 @@ class _LambdaWithdrawalKeywords():
         # r = json.loads(res.content.decode())
         status = json.loads(res.content.decode()).get('statusCode')
         if status =='0':
+            sql = "SELECT * FROM `withdrawal_iou_audit_info` WHERE withdrawal_id = '%s' AND pay_account_id ='%s' , \
+                  AND iou_amt ='%s',AND loan_duration ='%s'" %(withdrawalId,ids[0],loanDuration)
+            self.db = LambdaDbCon(self._lambda_db_host, self._lambda_db_user, self._lambda_db_passwd,
+                                  self._lambda_db_port, self._lambda_db_charset)
+            db_check_flag = self.db.check_db(sql)
+            if db_check_flag == 0:
+                logger.info('拆分借据的数据库验证成功')
             left_amt = json.loads(res.content.decode()).get('data') #借据拆分后，返回剩余可拆分金额
             return left_amt
         else:
             statusDesc = json.loads(res.content.decode()).get('statusDesc')
             raise Exception("拆分借据失败：%s" % statusDesc)
-    def del_withdrawal_iou(self):
-        #删除借据
-        #/ iou / delete
-        pass
+
+    def del_withdrawal_iou(self, iou_id):
+        """
+        【功能】：删除提款审核中的借据
+
+        【参数】：
+
+        iou_id:借据id
+
+        【返回值】：无
+        """
+        url = "%s/iou/delete" % self._lambda_url
+        data = {
+            "id": iou_id
+        }
+        res = self._request.post(url, data=data)  # webforms格式的参数
+        status = json.loads(res.content.decode()).get('statusCode')
+        if status == '0':
+            logger.info("删除借据成功")
+        else:
+            statusDesc = json.loads(res.content.decode()).get('statusDesc')
+            raise Exception("删除借据失败：%s" %statusDesc)
 
     # 提款申请审批拒绝
     # withdrawal_id: 提款申请id
-    def withdrawal_apply_aduit_reject(self,withdrawal_id):
-        pass
+    def withdrawal_reject(self,taskid):
+        """
+        【功能】：提款审批拒绝
+
+        【参数】：
+
+        taskid: 任务id
+
+        【返回值】：无
+        """
+        url = "%s/withdrawal/apply/reject" % self._lambda_url
+        data = {
+            "taskId": taskid
+        }
+        res = self._request.post(url, data=data)  # webforms格式的参数
+        status = json.loads(res.content.decode()).get('statusCode')
+        if status == '0':
+            logger.info("提款审批拒绝成功")
+        else:
+            statusDesc = json.loads(res.content.decode()).get('statusDesc')
+            raise Exception("提款审批拒绝失败：%s" %statusDesc)
         
     # 提款申请审批回退
     # withdrawal_id: 提款申请id
     # back_role:回退节点
-    def withdrawal_apply_aduit_back(self,withdrawal_id,back_role):
+    def withdrawal_back(self,withdrawal_id,back_role):
         pass
         
     # 提款申请审批撤销
     # withdrawal_id: 提款申请id
-    def withdrawal_apply_aduit_cancel(self,withdrawal_id):
+    def withdrawal_cancel(self,withdrawal_id):
         pass
         
     # 提款申请审批回收
