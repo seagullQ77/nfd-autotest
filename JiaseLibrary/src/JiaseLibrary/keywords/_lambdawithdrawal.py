@@ -4,8 +4,8 @@ from robot.api import logger
 from utils.lambda_db import LambdaDbCon
 from faker.factory import Factory
 myfaker = Factory.create('zh_CN')
-
 text = myfaker.text() #随机生成一段文本
+
 class _LambdaWithdrawalKeywords():
     
     def __init__(self):
