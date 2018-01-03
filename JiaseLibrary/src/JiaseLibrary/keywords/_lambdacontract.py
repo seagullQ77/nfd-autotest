@@ -19,6 +19,16 @@ class _LambdaContractKeywords():
                 if key == 'loanApplyId' and value == loan_id:
                     return i.get('id'),i.get('signStatus'),i.get('contractNo'),i.get('custName')
 
+    # contract_no 根据合同编号返回对应的合同id(给提款用)
+    def query_conid_by_contractno(self, contract_no):
+        url = '%s/contract/main/list' % self._lambda_url
+        params = {"loan_id": contract_no}
+        res = self._request.get(url, params=params)
+        response = res.content.decode('utf-8')
+        for i in json.loads(response).get('list'):
+            for key, value in i.items():
+                if key == 'contractNo' and value == contract_no:
+                    return i.get('id')
 
     #查询操作，确定签订后合同状态是否变为了已签订
     def _check_loan_contract_status(self, loan_id):

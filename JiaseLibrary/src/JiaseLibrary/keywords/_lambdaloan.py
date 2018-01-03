@@ -77,22 +77,9 @@ class _LambdaLoanKeywords():
         ret = json.loads(res.content.decode())
         if ret.get('statusCode') == '0':
             logger.info('获取有效的产品授信配置成功')
-            return ret
+            return ret.get('data')
         else:
             raise AssertionError('获取有效的产品授信配置失败,错误码:%s,错误信息:%s' % (ret.get('statusCode'), ret.get('statusDesc')))
-
-    def query_prod_credit_id(self,cust_type, prod_id, loan_apply_id, loan_detail_id):
-        '''
-        获取产品授信配置id
-        :param cust_type:客户类型
-        :param prod_id:产品id
-        :param loan_apply_id:授信id
-        :param loan_detail_id:授信明细id
-        :return:产品授信配置id
-        '''
-        effectived_credit_config = self.effectived_credit_config_query(cust_type, prod_id, loan_apply_id, loan_detail_id)
-        prod_credit_id = effectived_credit_config.get('data').get('prodCreditConfig').get('id')
-        return prod_credit_id
 
     def query_fund_source(self,fund_source_type_code):
         url = '%s/common/public/queryFundSource' % self._lambda_url
@@ -185,7 +172,7 @@ class _LambdaLoanKeywords():
         :param prod_id:产品id
         :return:
         '''
-        mgnt_fees_list = effectived_credit_config.get('data').get('mgntFees')
+        mgnt_fees_list = effectived_credit_config.get('mgntFees')
 
         for mgnt_fees in mgnt_fees_list:
             mgnt_fees_id = mgnt_fees.get('id')
@@ -221,7 +208,7 @@ class _LambdaLoanKeywords():
         :param prod_id:产品id
         :return:
         '''
-        service_fees_list = effectived_credit_config.get('data').get('serviceFees')
+        service_fees_list = effectived_credit_config.get('serviceFees')
         for service_fees in service_fees_list:
             service_fees_id = service_fees.get('id')
             service_fees_value = str(round(random.uniform(1,10),1))
@@ -269,9 +256,9 @@ class _LambdaLoanKeywords():
             logger.info('新增授信成功')
             loan_apply_id = ret.get('data').get('id')
             sql = "SELECT COUNT(*) FROM loan_credit_apply WHERE id='%s' AND cust_id='%s'" %(loan_apply_id,cust_id)
-            self.db = LambdaDbCon(self._lambda_db_host,self._lambda_db_user,self._lambda_db_passwd,self._lambda_db_port,self._lambda_db_charset)
-            db_check_flag = self.db.check_db(sql)
-            if db_check_flag == 0:
+            db = LambdaDbCon(self._lambda_db_host,self._lambda_db_user,self._lambda_db_passwd,self._lambda_db_port,self._lambda_db_charset)
+            db_check_flag = db.check_db(sql)
+            if db_check_flag:
                 logger.info('新增授信数据库验证成功')
                 return loan_apply_id
             else:
@@ -304,9 +291,9 @@ class _LambdaLoanKeywords():
             logger.info('生成授信明细id成功')
             loan_detail_id = ret.get('data').get('id')
             sql = "SELECT count(*) FROM loan_credit_detail WHERE cust_id ='%s' AND loan_apply_id='%s' AND id='%s'" %(cust_id,loan_apply_id,loan_detail_id)
-            self.db = LambdaDbCon(self._lambda_db_host,self._lambda_db_user,self._lambda_db_passwd,self._lambda_db_port,self._lambda_db_charset)
-            db_check_flag = self.db.check_db(sql)
-            if db_check_flag == 0:
+            db = LambdaDbCon(self._lambda_db_host,self._lambda_db_user,self._lambda_db_passwd,self._lambda_db_port,self._lambda_db_charset)
+            db_check_flag = db.check_db(sql)
+            if db_check_flag:
                 logger.info('新增授信明细数据库验证成功')
                 return loan_detail_id
             else:
@@ -352,7 +339,7 @@ class _LambdaLoanKeywords():
         else:
             raise AssertionError('获取账户约定信息失败,错误码:%s,错误信息: %s' % (ret.get('statusCode'), ret.get('statusDesc')))
 
-    def update_agreement(self,cust_id,cust_type, loan_apply_id, loan_detail_id):
+    def update_agreement(self, loan_apply_id, loan_detail_id):
         '''
         更新账户约定信息
         :param cust_id:客户id
@@ -364,8 +351,9 @@ class _LambdaLoanKeywords():
         agreement_info_list = self.query_agreement_list(loan_detail_id)
         for agreement_info in agreement_info_list:
             agreement_id = agreement_info.get('id')
-            bank_info = self.bank_list(cust_id, cust_type)[0]
-            account_name = bank_info.get('accountName')
+            account_name = agreement_info.get('accountName')
+            cust_id = agreement_info.get('custId')
+            bank_info = self.bank_list(cust_id, 1)[0]
             card_no = bank_info.get('cardNo')
             pre_id_no = bank_info.get('preIdno')
             pre_phone = bank_info.get('prePhone')
@@ -399,9 +387,9 @@ class _LambdaLoanKeywords():
                 logger.info('更新账户约定成功')
                 sql = "SELECT COUNT(*) FROM contract_agreement  WHERE id='%s' AND loan_apply_id='%s' AND loan_detail_id='%s' AND cust_id='%s' AND bank_id='%s' and apply_type='%s'" \
                         % (str(agreement_id),str(loan_apply_id),str(loan_detail_id),str(cust_id),str(bank_id),str(apply_type))
-                self.db = LambdaDbCon(self._lambda_db_host,self._lambda_db_user,self._lambda_db_passwd,self._lambda_db_port,self._lambda_db_charset)
-                db_check_flag = self.db.check_db(sql)
-                if db_check_flag == 0:
+                db = LambdaDbCon(self._lambda_db_host,self._lambda_db_user,self._lambda_db_passwd,self._lambda_db_port,self._lambda_db_charset)
+                db_check_flag = db.check_db(sql)
+                if db_check_flag:
                     logger.info('新增授信明细数据库验证成功')
                 else:
                     raise AssertionError('更新账户约定数据库验证失败 sql:%s' % sql)
@@ -447,6 +435,13 @@ class _LambdaLoanKeywords():
         :param prod_name:产品名称
         :param loan_apply_id:授信id
         :param loan_detail_id:授信明细id
+        :param kwargs:
+            self_limit:自贷额度
+            loan_duration:自带额度
+            loan_duration_unit:额度单位
+            limit_type:额度类型
+            repayment_type:还款方式
+            withhold:是否代扣
         :return:
         '''
 
@@ -458,46 +453,66 @@ class _LambdaLoanKeywords():
         cust_id = cust_info.get('baseInfo').get('id')
         prod_id = self.query_prod_id(prod_name)
         effectived_credit_config = self.effectived_credit_config_query(cust_type, prod_id, loan_apply_id, loan_detail_id)
-        prod_credit_id = effectived_credit_config.get('data').get('prodCreditConfig').get('id')
+        prod_credit_config = effectived_credit_config.get('prodCreditConfig')
+        prod_credit_id = prod_credit_config.get('id')
         self.update_mgnt_fees(effectived_credit_config,loan_apply_id, loan_detail_id, prod_id)
         self.update_service_fees(effectived_credit_config,loan_apply_id, loan_detail_id, prod_id)
 
+
         # 授信期限与授信期限单位
-        loan_duration_unit = random.choice(["MONTH",'DAY']) # 授信期限单位
+        loan_duration_unit = kwargs.get('loan_duration_unit',random.choice(["MONTH",'DAY'])) # 授信期限单位
+        loan_duration_min = int(prod_credit_config.get('creditDurationMin'))
+        loan_duration_max = int(prod_credit_config.get('creditDurationMax'))
         if loan_duration_unit == 'MONTH':
-            loan_duration = str(random.randint(1, 12))
+            loan_duration = str(random.randint(loan_duration_min, loan_duration_max))
         else:
-            loan_duration = str(random.randint(60,365))
+            loan_duration = str(random.randint(loan_duration_min*28,loan_duration_max*28))
+        loan_duration = kwargs.get('loan_duration',loan_duration)
 
-
-        self_limit = str(random.randint(5,5000)*1000) #自带额度
-        limit_type = random.choice(['GENERAL','SPECIAL']) # 额度类型
+        self_limit = kwargs.get('self_limit', str(random.randint(5,5000)*1000)) #自带额度
+        limit_type = kwargs.get('limit_type', random.choice(['GENERAL','SPECIAL'])) # 额度类型
         single_withdrawal_period = str(random.randint(1,10)) # 单笔提款最长期限
         limit_duration = str(random.randint(1,10)) # 额度存续期限
         borrower_ratio = str(round(random.uniform(1,10),1))  # 借款人质保金比例
-        # loan_year_rate = "6" 
         init_interest_subsidy = "N" # 无用
 
-        # TODO 添加担保方还没搞好,这里先固定为不贴息
-        #interest_subsidy = random.choice(['Y','N']) # 是否贴息
-        interest_subsidy = 'N' # 是否贴息
+        interest_subsidy_area = prod_credit_config.get('alllowDiscount').split(',')
+        interest_subsidy = random.choice(interest_subsidy_area) # 是否贴息
         interest_subsidy_ratio = '0'
 
         borrow_year_rate = str(round(random.uniform(1,10),1)) # 借款主体承担年利率
 
-        repayment_type = random.choice(['DEBX','YCFQ','XXHB','ZQBX','FDHK']) # 还款方式
-        interest_settlement_unit = random.choice(['M','S']) # 结息周期(M,S)
-        interest_settlement_type = random.choice(['GDR','DYR']) # 结息方式(GDR,DYR)
-        repayment_datetime = str(random.randint(1,28)) #固定还款日
-        main_guarantee_type = random.choice(['DY','ZY','BZ','XY']) # 主担保方式
-        group_guarantee_type = random.choice(['BL','JZ']) # 组合担保类型
+        repayment_type_area = prod_credit_config.get('repaymentType').split(',')
+        repayment_type = kwargs.get('repayment_type', random.choice(repayment_type_area)) # 还款方式
 
-        group_guarantee = ','.join(random.sample(['DY','ZY','BZ','XY'],random.choice(range(1,len(['DY','ZY','BZ','XY'])+1)))) #组合担保
-        repayment_source = ','.join(random.sample(['JYSR','NCPXS','GTSR','BRSR'],random.choice(range(1,len(['JYSR','NCPXS','GTSR','BRSR'])+1)))) #还款来源
+        interest_settlement_unit_area = prod_credit_config.get('interestSettlementDuration').split(',')
+        interest_settlement_unit = random.choice(interest_settlement_unit_area) # 结息周期(M,S)
 
-        loan_purpose_type = random.choice(['ZJZZ','NJCG','OTHER']) # 贷款用途
-        loan_payment_mode = random.choice(['ZZZF','HHZF','QBSTZF']) # 借款支付方式
-        withhold = random.choice(['true','false']) # 是否代扣
+        interest_settlement_type_area = prod_credit_config.get('interestSettlementType').split(',')
+        interest_settlement_type = random.choice(interest_settlement_type_area) # 结息方式(GDR,DYR)
+
+        repayment_datetime_min = int(prod_credit_config.get('fixDayMin'))
+        repayment_datetime_max = int(prod_credit_config.get('fixDayMax'))
+        repayment_datetime = str(random.randint(repayment_datetime_min,repayment_datetime_max)) #固定还款日
+
+        main_guarantee_type_area = prod_credit_config.get('mainGuaranteeForm').split(',')
+        main_guarantee_type = random.choice(main_guarantee_type_area) # 主担保方式
+
+        group_guarantee_type_area = prod_credit_config.get('combinationGuaranteeType').split(',')
+        group_guarantee_type = random.choice(group_guarantee_type_area) # 组合担保类型
+
+        group_guarantee_area = prod_credit_config.get('combinationGuarantee').split(',')
+        group_guarantee = ','.join(random.sample(group_guarantee_area,random.choice(range(1,len(group_guarantee_area)+1)))) #组合担保
+
+        repayment_source_area = prod_credit_config.get('repaymentSource').split(',')
+        repayment_source = ','.join(random.sample(repayment_source_area,random.choice(range(1,len(repayment_source_area)+1)))) #还款来源
+
+        loan_purpose_type_area = prod_credit_config.get('loanUsage').split(',')
+        loan_purpose_type = random.choice(loan_purpose_type_area) # 贷款用途
+
+        loan_payment_mode_area = prod_credit_config.get('paymentType').split(',')
+        loan_payment_mode = random.choice(loan_payment_mode_area) # 借款支付方式
+        withhold = kwargs.get('withhold',random.choice(['true','false'])) # 是否代扣
         
         if interest_settlement_type == 'DYR':
             repayment_datetime = None
@@ -558,9 +573,7 @@ class _LambdaLoanKeywords():
             fund_source_type = fund_source_dict.get('categoryCode')
 
         self.loan_detail_self_temp_save(cust_id, prod_credit_id,prod_id,loan_apply_id, loan_detail_id,borrower_ratio,interest_subsidy_ratio,withhold)
-        self.update_agreement(cust_id,cust_type, loan_apply_id, loan_detail_id)
-
-        self_limit = kwargs.get('self_limit',self_limit)
+        self.update_agreement(loan_apply_id, loan_detail_id)
 
         url = '%s/loan/credit/details/self/save' % self._lambda_url
         data = {
@@ -617,21 +630,22 @@ class _LambdaLoanKeywords():
         ret = json.loads(res.content.decode())
         if ret.get('statusCode') == '0':
             logger.info('保存自贷额度成功')
-            sql =   "SELECT COUNT(*) FROM loan_detail_self WHERE \
-                    id = '%s' \
-                    AND  self_limit='%s' \
-                    AND cust_id = '%s' \
-                    AND limit_duration = '%s' \
-                    AND single_withdrawal_period = '%s' \
-                    AND borrower_ratio = '%s' \
-                    AND loan_year_rate = '%s' \
-                    AND interest_subsidy = '%s' \
-                    AND interest_subsidy_ratio = '%s' \
-                    AND borrow_year_rate = '%s' \
-                    AND repayment_type = '%s' \
-                    AND loan_purpose_type = '%s' \
-                    AND loan_payment_mode = '%s'" \
-                    % (
+            sql =   """
+                    SELECT COUNT(*) FROM loan_detail_self WHERE
+                    id = '%s'
+                    AND  self_limit='%s'
+                    AND cust_id = '%s'
+                    AND limit_duration = '%s'
+                    AND single_withdrawal_period = '%s'
+                    AND borrower_ratio = '%s'
+                    AND loan_year_rate = '%s'
+                    AND interest_subsidy = '%s'
+                    AND interest_subsidy_ratio = '%s'
+                    AND borrow_year_rate = '%s'
+                    AND repayment_type = '%s'
+                    AND loan_purpose_type = '%s'
+                    AND loan_payment_mode = '%s'
+                    """% (
                     loan_detail_id,
                     "%.3f" % (float(self_limit)),
                     cust_id,
@@ -646,9 +660,9 @@ class _LambdaLoanKeywords():
                     loan_purpose_type,
                     loan_payment_mode
                     )
-            self.db = LambdaDbCon(self._lambda_db_host,self._lambda_db_user,self._lambda_db_passwd,self._lambda_db_port,self._lambda_db_charset)
-            db_check_flag = self.db.check_db(sql)
-            if db_check_flag == 0:
+            db = LambdaDbCon(self._lambda_db_host,self._lambda_db_user,self._lambda_db_passwd,self._lambda_db_port,self._lambda_db_charset)
+            db_check_flag = db.check_db(sql)
+            if db_check_flag:
                 logger.info('保存自贷额度数据库验证成功')
             else:
                 raise AssertionError('保存自贷额度数据库验证失败 sql:%s' % sql)
@@ -663,6 +677,12 @@ class _LambdaLoanKeywords():
         :param prod_name:产品名称
         :param loan_apply_id:授信id
         :param loan_detail_id:授信明细id
+        :param kwargs
+            self_limit:自贷额度
+            guarantee_limit:担保额度
+            loan_duration_unit:额度单位
+            limit_type:额度类型
+            repayment_type:还款方式
         :return:
         '''
 
@@ -674,17 +694,21 @@ class _LambdaLoanKeywords():
         cust_id = cust_info.get('baseInfo').get('id')
         prod_id = self.query_prod_id(prod_name)
         effectived_credit_config = self.effectived_credit_config_query(cust_type, prod_id, loan_apply_id, loan_detail_id)
-        prod_credit_id = effectived_credit_config.get('data').get('prodCreditConfig').get('id')
+        prod_credit_config = effectived_credit_config.get('prodCreditConfig')
+        prod_credit_id = prod_credit_config.get('id')
 
         # 授信期限与授信期限单位
-        loan_duration_unit = random.choice(["MONTH",'DAY']) # 授信期限单位
+        loan_duration_unit = kwargs.get('loan_duration_unit',random.choice(["MONTH",'DAY'])) # 授信期限单位
+        loan_duration_min = int(prod_credit_config.get('creditDurationMin'))
+        loan_duration_max = int(prod_credit_config.get('creditDurationMax'))
         if loan_duration_unit == 'MONTH':
-            loan_duration = str(random.randint(1, 12))
+            loan_duration = str(random.randint(loan_duration_min, loan_duration_max))
         else:
-            loan_duration = str(random.randint(60,365))
+            loan_duration = str(random.randint(loan_duration_min*28,loan_duration_max*28))
+        loan_duration = kwargs.get('loan_duration',loan_duration)
 
-        guarantee_limit = str(random.randint(5,5000) * 1000)
-        limit_type = random.choice(['GENERAL','SPECIAL'])
+        guarantee_limit = kwargs.get('guarantee_limit',str(random.randint(5,5000) * 1000))
+        limit_type = kwargs.get('limit_type',random.choice(['GENERAL','SPECIAL']))
         limit_duration = str(random.randint(1,10)) # 额度存续期限
         single_highest_limit =  str(int(guarantee_limit) - (random.randint(1,int(guarantee_limit)/1000)*1000))# 单笔最高授信额度
         single_longest_limit_duration = str(random.randint(1,10))
@@ -695,15 +719,31 @@ class _LambdaLoanKeywords():
         guarantee_ratio = str(round(random.uniform(1,10),1))
         config_borrow_year_rate = str(round(random.uniform(1,10),1))
         borrow_year_rate = str(round(random.uniform(1,10),1)) # 借款主体承担年利率
-        repayment_type = random.choice(['DEBX','YCFQ','XXHB','ZQBX','FDHK']) # 还款方式
-        interest_settlement_unit = "M" # 结息周期(M,S)
-        interest_settlement_type = random.choice(['GDR','DYR']) # 结息方式(GDR,DYR)
-        repayment_datetime = str(random.randint(1,28)) #固定还款日
-        main_guarantee_type = random.choice(['DY','ZY','BZ','XY']) # 主担保方式
-        group_guarantee_type = random.choice(['BL','JZ']) # 组合担保类型
-        group_guarantee = ','.join(random.sample(['DY','ZY','BZ','XY'],random.choice(range(1,len(['DY','ZY','BZ','XY'])+1)))) #组合担保
 
-        loan_payment_mode = random.choice(['ZZZF','HHZF','QBSTZF']) # 借款支付方式
+        repayment_type_area = prod_credit_config.get('repaymentType').split(',')
+        repayment_type = random.choice(repayment_type_area) # 还款方式
+
+        interest_settlement_unit_area = prod_credit_config.get('interestSettlementDuration').split(',')
+        interest_settlement_unit = random.choice(interest_settlement_unit_area) # 结息周期(M,S)
+
+        interest_settlement_type_area = prod_credit_config.get('interestSettlementType').split(',')
+        interest_settlement_type = random.choice(interest_settlement_type_area) # 结息方式(GDR,DYR)
+
+        repayment_datetime_min = int(prod_credit_config.get('fixDayMin'))
+        repayment_datetime_max = int(prod_credit_config.get('fixDayMax'))
+        repayment_datetime = str(random.randint(repayment_datetime_min,repayment_datetime_max)) #固定还款日
+
+        main_guarantee_type_area = prod_credit_config.get('mainGuaranteeForm').split(',')
+        main_guarantee_type = random.choice(main_guarantee_type_area) # 主担保方式
+
+        group_guarantee_type_area = prod_credit_config.get('combinationGuaranteeType').split(',')
+        group_guarantee_type = random.choice(group_guarantee_type_area) # 组合担保类型
+
+        group_guarantee_area = prod_credit_config.get('combinationGuarantee').split(',')
+        group_guarantee = ','.join(random.sample(group_guarantee_area,random.choice(range(1,len(group_guarantee_area)+1)))) #组合担保
+
+        loan_payment_mode_area = prod_credit_config.get('paymentType').split(',')
+        loan_payment_mode = ','.join(random.sample(loan_payment_mode_area,random.choice(range(1,len(loan_payment_mode_area)+1)))) # 借款支付方式
 
 
         # DEBX 等额本息 
@@ -759,8 +799,6 @@ class _LambdaLoanKeywords():
             fund_source_dict = self.create_fund_source()
             fund_source = fund_source_dict.get('dictValue')
             fund_source_type = fund_source_dict.get('categoryCode')
-
-        guarantee_limit = kwargs.get('guarantee_limit', guarantee_limit)
 
         url = '%s/loan/credit/details/guarantor/save' % self._lambda_url
         data = {
@@ -820,7 +858,7 @@ class _LambdaLoanKeywords():
 
     def loan_detail_view(self,loan_detail_id):
         '''
-        查询授信详情
+        查询授信明细详情
         :param loan_detail_id:授信明细id
         :return:授信详情dict
         '''
@@ -836,13 +874,12 @@ class _LambdaLoanKeywords():
         else:
             raise AssertionError('查询授信详情失败,错误码:%s,错误信息:%s' % (ret.get('statusCode'), ret.get('statusDesc')))
 
-    def loan_detail_id_list_query(self,loan_apply_id):
+    def loan_apply_view(self, loan_apply_id):
         '''
-        查询授信下所有授信明细id
-        :param loan_apply_id:授信id
-        :return:授信明细id列表
+        查看授信申请详情
+        :param loan_apply_id:
+        :return:
         '''
-        loan_detail_id_list = []
         url = '%s/loan/apply/view' % self._lambda_url
         params =    {
                     "loanApplyId":loan_apply_id,
@@ -851,24 +888,52 @@ class _LambdaLoanKeywords():
         ret = json.loads(res.content.decode())
         if ret.get('statusCode') == '0':
             logger.info('授信详情查询成功')
-            loan_detail_list = ret.get('data').get('detailList')
-            for loan_detail in loan_detail_list:
-                loan_detail_id = loan_detail.get('id')
-                loan_detail_id_list.append(loan_detail_id)
+            return ret.get('data')
         else:
             raise AssertionError('授信详情查询失败,错误码:%s,错误信息:%s' % (ret.get('statusCode'), ret.get('statusDesc')))
 
+    def loan_detail_id_list_query(self,loan_apply_id):
+        '''
+        查询授信下所有授信明细id
+        :param loan_apply_id:授信id
+        :return:授信明细id列表
+        '''
+        loan_detail_id_list = []
+        loan_apply_info = self.loan_apply_view(loan_apply_id)
+        loan_detail_list = loan_apply_info.get('detailList')
+        for loan_detail in loan_detail_list:
+            loan_detail_id = loan_detail.get('id')
+            loan_detail_id_list.append(loan_detail_id)
         return loan_detail_id_list
 
-    def loan_apply_submit(self,loan_apply_id):
+    def loan_apply_submit(self,loan_apply_id,is_next='Y'):
         '''
-        授信提交,投资经理提交授信调用
+        授信提交,投资经理提交授信申请
         :param loan_apply_id: 授信id
+        :param is_next: Y/y:提交到下一节点  N/n:提交到被打回节点
         :return:
         '''
+        task_id = self.loan_apply_task_id_query(loan_apply_id)
+
+        # 授信task_id若存在,则表明是已经提交过了的,不存在则表示是初次提交
+        if task_id:
+            auditor_info = self.loan_apply_auditor_query(loan_apply_id,is_next)
+            candidate_group_id = auditor_info.get('positionCode')
+            assignee_user_id = auditor_info.get('userId')
+            task_def_key = auditor_info.get('taskDefKey')
+        else:
+            assignee_user_id = None
+            candidate_group_id = None
+            task_def_key = None
+
         url = '%s/loan/apply/submit' % self._lambda_url
         payload = {
-            "loanApplyId": loan_apply_id
+            "loanApplyId": loan_apply_id,
+            "assigneeUserId":assignee_user_id,
+            "candidateGroupId":candidate_group_id,
+            "taskDefKey":task_def_key,
+            "taskId":task_id
+
         }
         res = self._request.post(url, data=json.dumps(payload), headers=self._headers)
         ret = json.loads(res.content.decode())
@@ -878,16 +943,76 @@ class _LambdaLoanKeywords():
             raise AssertionError('授信提交失败,错误码:%s,错误信息:%s' % (ret.get('statusCode'), ret.get('statusDesc')))
 
 
-    def loan_apply_pass(self,loan_apply_id,is_claim=None,is_approved=None,assignee_user_id=None,candidate_group=None):
+    def loan_apply_pass(self,loan_apply_id,is_next='Y',is_claim=None,candidate_group=None):
         '''
         授信审批,投资经理之后的每一步审批提交都需要调用
         :param loan_apply_id:授信id
+        :param is_next: Y/y:提交到下一节点  N/n:提交到被打回节点
         :param is_claim: 是否领取任务,Y:领取
-        :param is_approved: 是否填写审核意见,Y:填写
-        :param assignee_user_id: 提交到的用户id
         :param candidate_group:岗位列表,格式为list 如: ['一级审批岗','二级审批岗','三级审批岗']
         :return:
         '''
+        candidate_group_id = []
+        task_id = self.loan_apply_task_id_query(loan_apply_id)
+        process_status = self.loan_apply_view(loan_apply_id).get('processStatus') #流程状态
+        if process_status == 'BACK':
+            auditor_info = self.loan_apply_auditor_query(loan_apply_id,is_next=is_next)
+            assignee_user_id = auditor_info.get('userId')
+            task_def_key = auditor_info.get('taskDefKey')
+            candidate_group_id = None
+        elif process_status == 'RETREAT':
+            assignee_user_id = None
+            task_def_key = None
+            candidate_group_id = None
+        elif process_status == 'PASS':
+            assignee_user_id = None
+            task_def_key = None
+            if candidate_group:
+                for candidate in candidate_group:
+                    if candidate == '一级审批岗':
+                        candidate_group_id.append('POSITION_PRIMARY_AUDIT')
+                    elif candidate == '二级审批岗':
+                        candidate_group_id.append('POSITION_SECONDARY_AUDIT')
+                    elif candidate == '三级审批岗':
+                        candidate_group_id.append('POSITION_THIRD_AUDIT')
+                    else:
+                        pass
+        else:
+            raise  AssertionError('授信流程状态不正确,授信id:%s,授信流程状态:%s' %(loan_apply_id,process_status))
+        # 领取任务
+        if is_claim == 'Y' or is_claim == 'y':
+            self.loan_task_claim(loan_apply_id)
+
+        # 审核意见
+        loan_detail_id_list = self.loan_detail_id_list_query(loan_apply_id)
+        for i,loan_detail_id in enumerate(loan_detail_id_list):
+            if i == 0:
+                self.loan_advice(loan_detail_id, is_approved='1')
+            else:
+                self.loan_advice(loan_detail_id, is_approved=random.choice(['1','0']))
+
+        url = '%s/loan/apply/pass' % self._lambda_url
+        payload =   {
+                    "assigneeUserId": assignee_user_id,
+                    "candidateGroupId": candidate_group_id,
+                    "taskDefKey":task_def_key,
+                    "taskId":task_id
+                    }
+        res = self._request.post(url, data=json.dumps(payload), headers=self._headers)
+        ret = json.loads(res.content.decode())
+        if ret.get('statusCode') == '0':
+            logger.info('授信通过成功')
+        else:
+            raise AssertionError('授信通过失败,错误码:%s,错误信息:%s' % (ret.get('statusCode'), ret.get('statusDesc')))
+
+    def loan_apply_auditor_query(self,loan_apply_id,is_next='Y',user_name=None,candidate_group=None):
+        '''
+        查询授信可用审核人列表
+        :param loan_apply_id:授信id
+        :param is_next: Y/y:下一流程节点  N/n:回退的流程节点
+        :return:
+        '''
+
         candidate_group_id = []
         if candidate_group:
             for candidate in candidate_group:
@@ -900,36 +1025,38 @@ class _LambdaLoanKeywords():
                 else:
                     pass
 
+        url = '%s/loan/apply/auditor' % self._lambda_url
 
-        task_id = self.loan_apply_task_id_query(loan_apply_id)
-
-        # 领取任务
-        if is_claim == 'Y' or is_claim == 'y':
-            self.loan_task_claim(loan_apply_id)
-
-        #审核意见
-        if is_approved == 'Y' or is_approved == 'y':
-            loan_detail_id_list = self.loan_detail_id_list_query(loan_apply_id)
-            loan_detail_num = len(loan_detail_id_list)
-
-            for i,loan_detail_id in enumerate(loan_detail_id_list):
-                if i == 0:
-                    self.loan_advice(loan_detail_id, is_approved='1')
-                else:
-                    self.loan_advice(loan_detail_id, is_approved=random.choice(['1','0']))
-
-        url = '%s/loan/apply/pass' % self._lambda_url
         payload =   {
-                    "assigneeUserId": assignee_user_id,
-                    "candidateGroupId": candidate_group_id,
-                    "taskId":task_id
+                    "loanApplyId":loan_apply_id,
+                    "pageSize":100,
+                    "pageNo":1,
+                    "userName":user_name,
+                    "candidateGroupId":candidate_group_id
                     }
-        res = self._request.post(url, data=json.dumps(payload), headers=self._headers)
+        res = self._request.post(url, data=json.dumps(payload),headers=self._headers)
         ret = json.loads(res.content.decode())
         if ret.get('statusCode') == '0':
-            logger.info('授信通过成功')
+            logger.info('查询授信可用审核人列表成功')
+            auditor_info_list = ret.get('list')
+            if not auditor_info_list:
+                auditor_info = {}
+                return auditor_info
+            if len(auditor_info_list) == 1:
+                auditor_info = auditor_info_list[0]
+            else:
+                if is_next == 'Y' or is_next == 'y':
+                    for auditor_info in auditor_info_list:
+                        if auditor_info.get('group'):
+                            return auditor_info
+                elif is_next == 'N' or is_next == 'n':
+                    for auditor_info in auditor_info_list:
+                        if not auditor_info.get('group'):
+                            return auditor_info
+                else:
+                    pass
         else:
-            raise AssertionError('授信通过失败,错误码:%s,错误信息:%s' % (ret.get('statusCode'), ret.get('statusDesc')))
+            raise AssertionError('查询授信可用审核人列表失败,错误码:%s,错误信息:%s' % (ret.get('statusCode'), ret.get('statusDesc')))
 
     def loan_apply_list(self,page_size=100,page_no=1):
         '''
@@ -957,32 +1084,23 @@ class _LambdaLoanKeywords():
         :param loan_apply_id:授信id
         :return:task_id
         '''
-        loan_apply_lst = self.loan_apply_list()
-        for loan_apply in loan_apply_lst:
-            if str(loan_apply.get('id')) == str(loan_apply_id):
-                loan_apply_task_id = loan_apply.get('taskId')
-                break
-        else:
-            raise AssertionError('授信列表中找不到对应的授信id,授信id:%s' % loan_apply_id)
-        return loan_apply_task_id
+        loan_apply_info_list = self.loan_apply_list(loan_apply_id)
+        for loan_apply_info in loan_apply_info_list:
+            if loan_apply_info.get('id') == loan_apply_id:
+                loan_apply_task_id = loan_apply_info.get('taskId')
+                return loan_apply_task_id
 
     def loan_apply_cust_info_query(self,loan_apply_id):
         '''
-        查询授信task_id
+        查询授信授信客户信息
         :param loan_apply_id:授信id
-        :return:task_id
+        :return:授信客户信息dict
         '''
-        loan_apply_cust_info = ()
-        loan_apply_lst = self.loan_apply_list()
-        for loan_apply in loan_apply_lst:
-            if str(loan_apply.get('id')) == str(loan_apply_id):
-                loan_apply_cust_info =  {
-                                        'cust_name':loan_apply.get('custName'),
-                                        'cust_type':loan_apply.get('custType')
-                                        }
-                break
-        else:
-            raise AssertionError('授信列表中找不到对应的授信id,授信id:%s' % loan_apply_id)
+        loan_apply_info = self.loan_apply_view(loan_apply_id)
+        loan_apply_cust_info =  {
+                                'cust_name':loan_apply_info.get('custName'),
+                                'cust_type':loan_apply_info.get('custType')
+                                }
         return loan_apply_cust_info
 
     def loan_task_claim(self,loan_apply_id):
@@ -1102,12 +1220,11 @@ class _LambdaLoanKeywords():
         else:
             raise AssertionError('授信撤销失败,错误码:%s,错误信息:%s' % (ret.get('statusCode'), ret.get('statusDesc')))
 
-    def loan_apply_reject(self,loan_apply_id,is_claim=None,is_approved=None):
+    def loan_apply_reject(self,loan_apply_id,is_claim=None):
         '''
         授信审批拒绝
         :param loan_apply_id: 授信id
         :param is_claim: 是否领取任务,Y:领取
-        :param is_approved: 是否填写审核意见,Y:填写
         :return: 
         '''
 
@@ -1117,10 +1234,10 @@ class _LambdaLoanKeywords():
 
         # 审核意见
         # 选择审批【拒绝】，不能有审核【同意】的授信明细
-        if is_approved == 'Y' or is_approved == 'y':
-            loan_detail_id_list = self.loan_detail_id_list_query(loan_apply_id)
-            for loan_detail_id in loan_detail_id_list:
-                self.loan_advice(loan_detail_id, is_approved='1')
+
+        loan_detail_id_list = self.loan_detail_id_list_query(loan_apply_id)
+        for loan_detail_id in loan_detail_id_list:
+            self.loan_advice(loan_detail_id, is_approved='1')
 
         url = '%s/loan/apply/reject' % self._lambda_url
         task_id = self.loan_apply_task_id_query(loan_apply_id)
@@ -1144,7 +1261,7 @@ class _LambdaLoanKeywords():
 
         url = '%s/loan/apply/rollbackAuditor' % self._lambda_url
         params =   {
-                    "loanApplyId":loan_apply_id
+                    "applyId":loan_apply_id
                     }
         res = self._request.get(url, params=params, headers=self._headers)
         ret = json.loads(res.content.decode())
@@ -1154,13 +1271,12 @@ class _LambdaLoanKeywords():
         else:
             raise AssertionError('查询授信回退人列表失败,错误码:%s,错误信息:%s' % (ret.get('statusCode'), ret.get('statusDesc')))
 
-    def loan_apply_back(self,loan_apply_id,is_claim=None,is_approved=None,next_task=None):
+    def loan_apply_back(self,loan_apply_id,back_position,is_claim=None):
         '''
         授信申请回退
         :param loan_apply_id:授信id
         :param is_claim: 是否领取任务,Y:领取
-        :param is_approved: 是否填写审核意见,Y:填写
-        :param next_task:回退节点 申请/复核/内审/初审/复审
+        :param back_position:回退节点 申请/复核/内审/初审/复审
         :return:
         '''
 
@@ -1168,15 +1284,14 @@ class _LambdaLoanKeywords():
         if is_claim == 'Y' or is_claim == 'y':
             self.loan_task_claim(loan_apply_id)
 
-        #审核意见
-        if is_approved == 'Y' or is_approved == 'y':
-            loan_detail_id_list = self.loan_detail_id_list_query(loan_apply_id)
-            for loan_detail_id in loan_detail_id_list:
-                self.loan_advice(loan_detail_id, is_approved=random.choice(['1','0']))
+        loan_detail_id_list = self.loan_detail_id_list_query(loan_apply_id)
+        for loan_detail_id in loan_detail_id_list:
+            self.loan_advice(loan_detail_id, is_approved=random.choice(['1','0']))
 
         loan_apply_rollback_auditor_list = self.loan_apply_rollback_auditor(loan_apply_id)
+
         for loan_apply_rollback_auditor in loan_apply_rollback_auditor_list:
-            if loan_apply_rollback_auditor.get('nextTask') == next_task:
+            if loan_apply_rollback_auditor.get('nextTask') == back_position:
                 assignee_user_id = loan_apply_rollback_auditor.get('userId')
                 task_def_key = loan_apply_rollback_auditor.get('taskDefKey')
         if assignee_user_id and task_def_key:
@@ -1194,7 +1309,7 @@ class _LambdaLoanKeywords():
             else:
                 raise AssertionError('授信回退失败,错误码:%s,错误信息:%s' % (ret.get('statusCode'), ret.get('statusDesc')))
         else:
-            raise AssertionError('回退节点不正确,选择的回退节点为:%s' % next_task)
+            raise AssertionError('回退节点不正确,选择的回退节点为:%s')
 
     def loan_apply_retreat(self,loan_apply_id):
         '''
@@ -1215,3 +1330,163 @@ class _LambdaLoanKeywords():
         else:
             raise AssertionError('授信业务收回失败,错误码:%s,错误信息:%s' % (ret.get('statusCode'), ret.get('statusDesc')))
 
+    def loan_guarantors_query(self,cust_name):
+        '''
+        查询担保方相关信息
+        :param cust_name:客户名
+        :return:担保方相关信息dict
+        '''
+        url = '%s/loan/guarantors/queryGuarantorCust' % self._lambda_url
+        params =   {
+                    "name":cust_name
+                    }
+        res = self._request.get(url, params=params, headers=self._headers)
+        ret = json.loads(res.content.decode())
+        if ret.get('statusCode') == '0':
+            logger.info('查询担可用担保方成功')
+            guarantors_info_list = ret.get('data')
+            for guarantors_info in guarantors_info_list:
+                if guarantors_info.get('custName') == cust_name:
+                    return guarantors_info
+            else:
+                raise AssertionError('输入的客户在可用担保方中查询不到')
+
+        else:
+            raise AssertionError('查询可用担保方失败,错误码:%s,错误信息:%s' % (ret.get('statusCode'), ret.get('statusDesc')))
+
+    def loan_guarantors_create(self,loan_detail_id,guarantors_cust_name,**kwargs):
+        '''
+        新增担保方
+        :param loan_detail_id:授信明细id
+        :param cust_name:担保方名称
+        :param kwargs:
+            is_deductible_limit:是否扣减担保额度
+            is_main_guarantor:是否主担保方
+            is_provide_guarantee:是否对担保项下借款主体提供担保
+        :return:
+        '''
+        guarantors_info = self.loan_guarantors_query(guarantors_cust_name)
+        guarantors_cust_id = guarantors_info.get('id')
+        guarantors_cust_code = guarantors_info.get('custCode')
+
+        loan_detail_info = self.loan_detail_view(loan_detail_id)
+        loan_detail_self_info = loan_detail_info.get('detailSelfBean')
+        interest_subsidy = loan_detail_self_info.get('interestSubsidy')
+
+
+        guarantor_ratio =  str(random.randint(0,100))
+        deposit_ratio = str(random.randint(0,100))
+
+        if interest_subsidy == 'Y':
+            interest_subsidy_ratio = str(round(random.uniform(1, 10), 1))
+        else:
+            interest_subsidy_ratio = '0'
+
+        is_deductible_limit = kwargs.get('is_deductible_limit','false')
+        is_main_guarantor = kwargs.get('is_main_guarantor','false')
+        is_provide_guarantee = kwargs.get('is_provide_guarantee','false')
+        url = '%s/loan/guarantors/create' % self._lambda_url
+        payload =   {
+                    "id":"",
+                    "custId":guarantors_cust_id,
+                    "custName":guarantors_cust_name,
+                    "custCode":guarantors_cust_code,
+                    "guarantorRatio":guarantor_ratio, # 担保比例
+                    "depositRatio":deposit_ratio, # 质保金比例
+                    "interestSubsidyRatio":interest_subsidy_ratio, # 贴息比例
+                    "isDeductibleLimit":is_deductible_limit, # 是否扣减担保额度
+                    "isMainGuarantor":is_main_guarantor, # 是否主担保方
+                    "isProvideGuarantee":is_provide_guarantee, # 是否对担保项下借款主体提供担保
+                    "loanDetailId":loan_detail_id
+                    }
+
+        res = self._request.post(url, data=json.dumps(payload), headers=self._headers)
+        ret = json.loads(res.content.decode())
+        if ret.get('statusCode') == '0':
+            logger.info('新增授信担保方成功')
+            loan_detail_info = self.loan_detail_view(loan_detail_id)
+            loan_apply_id = loan_detail_info.get('loanApplyId')
+            loan_apply_info = self.loan_apply_view(loan_apply_id)
+            cust_id = loan_apply_info.get('custId')
+            cust_type = loan_apply_info.get('custType')
+            self.update_agreement(loan_apply_id, loan_detail_id)
+            sql =   """
+                    SELECT
+                      COUNT(*)
+                    FROM
+                      loan_guarantor_info
+                    WHERE loan_detail_id = '%s' 
+                      AND cust_name = '%s'
+                      AND guarantor_ratio = '%s'
+                      AND deposit_ratio = '%s'
+                      AND interest_subsidy_ratio = '%s'
+                      AND is_deductible_limit = '%s'
+                      AND is_main_guarantor = '%s'
+                      AND is_provide_guarantee = '%s'
+                    """ % (
+                    loan_detail_id,
+                    guarantors_cust_name,
+                    '%.3f' % (float(guarantor_ratio)),
+                    '%.3f' % (float(deposit_ratio)),
+                    '%.3f' % (float(interest_subsidy_ratio)),
+                    '0' if is_deductible_limit == "false" else '1',
+                    '0' if is_main_guarantor == "false" else '1',
+                    '0' if is_provide_guarantee == "false" else '1'
+                    )
+            db = LambdaDbCon(self._lambda_db_host, self._lambda_db_user, self._lambda_db_passwd, self._lambda_db_port,self._lambda_db_charset)
+            db_check_flag = db.check_db(sql)
+            if db_check_flag:
+                logger.info('新增授信担保方数据库验证成功')
+            else:
+                raise AssertionError('新增授信担保方数据库验证失败 sql:%s' % sql)
+        else:
+            raise AssertionError('新增授信担保方失败,错误码:%s,错误信息:%s' % (ret.get('statusCode'), ret.get('statusDesc')))
+
+    def loan_guarantors_delete(self,loan_detail_id,cust_name):
+        '''
+        新增担保方
+        :param loan_detail_id:授信明细id
+        :param cust_name:担保方名称
+        :return:
+        '''
+        loan_guarantors_id = self.loan_guarantors_list_query(loan_detail_id,cust_name)
+        url = '%s/loan/guarantors/delete' % self._lambda_url
+        payload =   {
+                    "id":loan_guarantors_id
+                    }
+        res = self._request.post(url, data=payload)
+        ret = json.loads(res.content.decode())
+        if ret.get('statusCode') == '0':
+            logger.info('删除授信担保方成功')
+            sql = "SELECT COUNT(*) FROM loan_guarantor_info WHERE loan_detail_id = '%s' AND  cust_name = '%s'" %(loan_detail_id,cust_name)
+            db = LambdaDbCon(self._lambda_db_host,self._lambda_db_user,self._lambda_db_passwd,self._lambda_db_port,self._lambda_db_charset)
+            db_check_flag = db.check_db(sql,0)
+            if db_check_flag:
+                logger.info('删除授信担保方数据库验证成功')
+            else:
+                raise AssertionError('删除授信担保方数据库验证失败 sql:%s' % sql)
+        else:
+            raise AssertionError('删除授信担保方失败,错误码:%s,错误信息:%s' % (ret.get('statusCode'), ret.get('statusDesc')))
+
+    def loan_guarantors_list_query(self,loan_detail_id,cust_name):
+        '''
+        查询授信担保方
+        :param loan_detail_id:授信明细id
+        :return:授信担保信息id
+        '''
+        url = '%s/loan/guarantors/list' % self._lambda_url
+        payload =   {
+                    "loanDetailId":loan_detail_id
+                    }
+        res = self._request.post(url, data=payload)
+        ret = json.loads(res.content.decode())
+        if ret.get('statusCode') == '0':
+            logger.info('查询担保方列表成功')
+            guarantors_list =  ret.get('data')
+            for guarantors in guarantors_list:
+                if guarantors.get('custName') == cust_name:
+                    return guarantors.get('id')
+            else:
+                raise AssertionError('授信担保方列表中找不到对应的担保方')
+        else:
+            raise AssertionError('查询担保方列表失败,错误码:%s,错误信息:%s' % (ret.get('statusCode'), ret.get('statusDesc')))
