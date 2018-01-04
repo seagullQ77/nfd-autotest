@@ -38,7 +38,7 @@ class _LambdaRepaymentKeywords():
 
      # 保存还款申请
     # repayment_id 还款申请的id
-    def _save_repayment_apply(self,create_data,receivedFundDate,inputAmt,):
+    def _save_repayment_apply(self,create_data,receivedFundDate,inputAmt):
         # 参数验证
         if receivedFundDate is None or inputAmt is None:
             raise Exception('请完善还款金额信息')
@@ -75,10 +75,54 @@ class _LambdaRepaymentKeywords():
     # repayment_order:入账顺序
     # amount:还款金额
     # 返回 repayment_id
-    def submit_repayment_apply(self,lend_code=None,issue=None,repayment_order=None,amount=None):
-        return repayment_id
-    
-    
+    def submit_repayment_apply(self,create_data,receivedFundDate,inputAmt):
+        url = '%s/repayment/apply/submit' % self._lambda_url
+        param = {
+            "lend_code": create_data['lend_code'],
+            "issue": create_data['issue'],
+            "repayment_order": create_data['repayment_order'],
+            "amount": create_data['inputAmt'],
+            "receivedFundDate": receivedFundDate,
+        }
+        res = self._request.post(url, headers=self._headers, data=json.dumps(param))
+        response = res.content.decode('utf-8')
+        # 把服务器返回的内容转换为python的字典
+        reply_json_dict = json.loads(response)
+        # 通过字典获取状态码
+        statusCode = reply_json_dict['statusCode']
+        statusDesc = reply_json_dict['statusDesc']
+
+    if statusCode == '0':
+        logger.info("提交成功！statusCode: %s, statusDesc: %s" % (reply_json_dict.get('statusCode'), reply_json_dict.get('statusDesc')))
+        sql = """
+                            SELECT
+                              COUNT(*)
+                            FROM
+                              Repayment_apply
+                            WHERE apply_code = '%s' 
+                              AND lend_code = '%s'
+                              AND status = '%s'
+                              AND cust_id = '%s'
+                              AND inputAmt = '%s'
+                            """ % (
+            applyCode,
+            lendCode,
+            status,
+            custId,
+            amount,
+        )
+        db = LambdaDbCon(self._lambda_db_host, self._lambda_db_user, self._lambda_db_passwd, self._lambda_db_port,
+                         self._lambda_db_charset)
+        db_check_flag = db.check_db(sql)
+        if db_check_flag and satus='AUDITING':
+            logger.info('新增还款申请数据库验证成功')
+        else:
+            raise AssertionError('新增还款申请数据库验证失败 sql:%s' % sql)
+        return 0
+    else:
+        raise Exception( '提交还款失败,错误码:%s,错误信息:%s' % (reply_json_dict.get('statusCode'), reply_json_dict.get('statusDesc')))
+
+
     # 还款申请审批通过
     # repayment_id: 还款申请id
     def repayment_apply_aduit_pass(self,repayment_id):
