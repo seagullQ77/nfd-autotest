@@ -78,9 +78,9 @@ class _LambdaRepaymentKeywords():
     def submit_repayment_apply(self,create_data,receivedFundDate,inputAmt):
         url = '%s/repayment/apply/submit' % self._lambda_url
         param = {
-            "lend_code": create_data['lend_code'],
+            "lend_code": create_data['lendCode'],
             "issue": create_data['issue'],
-            "repayment_order": create_data['repayment_order'],
+            "repayment_order": create_data['repayOrder'],
             "amount": create_data['inputAmt'],
             "receivedFundDate": receivedFundDate,
         }
@@ -118,7 +118,6 @@ class _LambdaRepaymentKeywords():
                 logger.info('新增还款申请数据库验证成功')
             else:
                 raise AssertionError('新增还款申请数据库验证失败 sql:%s' % sql)
-            return 0
         else:
             raise Exception( '提交还款失败,错误码:%s,错误信息:%s' % (reply_json_dict.get('statusCode'), reply_json_dict.get('statusDesc')))
 
