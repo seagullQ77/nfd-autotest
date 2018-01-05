@@ -8,15 +8,19 @@ import base64
 封装lambda的加密和解密方法
 '''
 
-key_dict =      {
-                'omega_test':'KOmegaDaiFaNongO',
-                'lambda_test':'KLambdaDaiFaNong',
-                'omega':'k2%&qOnL4x9mayP#',
-                'lambda':'k2%&qOnL4x9mayP#'
-                }
+
 
 class LambdaEncrpt():
-    def __init__(self,key,iv='0102030405060708'):
+    key_dict = {
+        'omega_test': 'KOmegaDaiFaNongO',
+        'lambda_test': 'KLambdaDaiFaNong',
+        'omega': 'k2%&qOnL4x9mayP#',
+        'lambda': 'k2%&qOnL4x9mayP#'
+    }
+
+    def __init__(self,env):
+        key = self.key_dict.get(env)
+        iv = '0102030405060708'
         self.key = key.encode()
         self.iv  = iv.encode()
         self.mode = AES.MODE_CBC
@@ -27,19 +31,16 @@ class LambdaEncrpt():
         generator = AES.new(self.key, self.mode, self.iv)
         crypt = generator.encrypt(pad_it(source).encode())
         cryptedStr = base64.b64encode(crypt)
-        print(cryptedStr.decode())
         return cryptedStr.decode()
     def _decrypt(self,text):
         unpad = lambda s : s[0:-ord(s.decode()[-1])]
         generator = AES.new(self.key, self.mode, self.iv)
         recovery = generator.decrypt(base64.b64decode(text))
         decryStr = unpad(recovery)
-        print(decryStr.decode())
         return decryStr.decode()
 
 
 if __name__ == '__main__':
-    key = key_dict.get('lambda_test')
-    pc = LambdaEncrpt(key)
-    pc._encrypt('410825199204257544')
-    pc._decrypt('/jBhRV13uDG7QoFwDrqCHyl/SCVzvVOJxCUQyffgnME=')
+    pc = LambdaEncrpt('lambda_test')
+    print(pc._encrypt('410825199204257544'))
+    print(pc._decrypt('/jBhRV13uDG7QoFwDrqCHyl/SCVzvVOJxCUQyffgnME='))
