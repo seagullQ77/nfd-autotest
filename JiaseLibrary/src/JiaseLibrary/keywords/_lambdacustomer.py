@@ -757,6 +757,7 @@ class _LambdaCustomerKeywords():
         sql = "UPDATE cust_info_base SET cust_status='JD',sync_status='SUCCESS' WHERE id='%s' AND cust_type='%s'" % (cust_id, cust_type)
         db = LambdaDbCon(self._lambda_db_host, self._lambda_db_user, self._lambda_db_passwd, self._lambda_db_port,self._lambda_db_charset)
         db.exec_sql(sql)
+        db.close()
         if cust_type == 'GR':
             sql = "UPDATE `cust_info_personal` SET id_check_result = 'PASS' WHERE id = '%s'" % cust_id
             db = LambdaDbCon(self._lambda_db_host, self._lambda_db_user, self._lambda_db_passwd, self._lambda_db_port,self._lambda_db_charset)
