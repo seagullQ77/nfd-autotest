@@ -177,18 +177,19 @@ class _LambdaCustomerKeywords():
         else:
             raise AssertionError('查询企业客户信息失败:错误码:%s,错误信息:%s' % (ret.get('statusCode'), ret.get('statusDesc')))
 
-    def custom_view(self,cust_id, cust_type):
+    def custom_view(self,cust_id):
         '''
         根据客户id与客户类型查询客户信息
         :param cust_name:客户名称
         :param cust_type:客户类型 GR:个人/QY:企业
         :return:客户信息dict
         '''
-        if cust_type == 'GR':
+        try:
             cust_info = self.custom_personal_view(cust_id)
-        if cust_type == 'QY':
+        except:
             cust_info = self.custom_enterprise_view(cust_id)
         return cust_info
+
 
 
     def custom_query(self,cust_name,cust_type,cust_id):
@@ -761,9 +762,3 @@ class _LambdaCustomerKeywords():
             db = LambdaDbCon(self._lambda_db_host, self._lambda_db_user, self._lambda_db_passwd, self._lambda_db_port,self._lambda_db_charset)
             db.exec_sql(sql)
 
-
-
-    
-    
-    
-    

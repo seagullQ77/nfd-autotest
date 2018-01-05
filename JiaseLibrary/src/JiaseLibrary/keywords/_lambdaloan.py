@@ -208,16 +208,18 @@ class _LambdaLoanKeywords():
             else:
                 raise AssertionError('更新%s失败,产品明细id:%s,错误码:%s,错误信息:%s' % (service_fees_item_name,loan_detail_id,ret.get('statusCode'), ret.get('statusDesc')))
 
-    def loan_apply_create(self,cust_id, cust_type):
+    def loan_apply_create(self,cust_id):
         '''
         新增授信
         :param cust_id:客户id
         :param cust_type:客户类型
         :return: 授信id
         '''
-        cust_info = self.custom_view(cust_id, cust_type)
+        cust_info = self.custom_view(cust_id)
         cust_name_full = cust_info.get('baseInfo').get('custName') + '(' + cust_info.get('baseInfo').get('idCode') + ')'
         cust_id = cust_info.get('baseInfo').get('id')
+        cust_type = cust_info.get('baseInfo').get('custType')
+
         url = '%s/loan/apply/add/create' % self._lambda_url
         data = {
             "custType": cust_type,
@@ -1287,13 +1289,13 @@ class _LambdaLoanKeywords():
         else:
             raise AssertionError('授信业务收回失败,错误码:%s,错误信息:%s' % (ret.get('statusCode'), ret.get('statusDesc')))
 
-    def loan_guarantors_query(self,cust_id,cust_type):
+    def loan_guarantors_query(self,cust_id):
         '''
         查询担保方相关信息
         :param cust_name:客户名
         :return:担保方相关信息dict
         '''
-        cust_info = self.custom_view(cust_id,cust_type)
+        cust_info = self.custom_view(cust_id)
         cust_name = cust_info.get('baseInfo').get('custName')
         url = '%s/loan/guarantors/queryGuarantorCust' % self._lambda_url
         params =   {
@@ -1313,7 +1315,7 @@ class _LambdaLoanKeywords():
         else:
             raise AssertionError('查询可用担保方失败,错误码:%s,错误信息:%s' % (ret.get('statusCode'), ret.get('statusDesc')))
 
-    def loan_guarantors_create(self,loan_detail_id,guarantors_cust_id,guarantors_cust_type,**kwargs):
+    def loan_guarantors_create(self,loan_detail_id,guarantors_cust_id,**kwargs):
         '''
         新增担保方
         :param loan_detail_id:授信明细id
@@ -1324,7 +1326,7 @@ class _LambdaLoanKeywords():
             is_provide_guarantee:是否对担保项下借款主体提供担保
         :return:
         '''
-        guarantors_info = self.loan_guarantors_query(guarantors_cust_id,guarantors_cust_type)
+        guarantors_info = self.loan_guarantors_query(guarantors_cust_id)
         guarantors_cust_id = guarantors_info.get('id')
         guarantors_cust_name = guarantors_info.get('custName')
         guarantors_cust_code = guarantors_info.get('custCode')

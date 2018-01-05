@@ -88,18 +88,19 @@ if __name__ == '__main__':
     jiase = JiaseLibrary()
     jiase.login_lambda(role='lambda_invest_manager')
 
+
     cust_personal_id = jiase.custom_personal_create(cust_name='test10个人')
     cust_enterprise_id = jiase.custom_enterprise_create(cust_personal_id,cust_name='test10企业')
 
     # 生成授信
-    loan_apply_id = jiase.loan_apply_create(cust_personal_id, 'GR')
+    loan_apply_id = jiase.loan_apply_create(cust_personal_id)
 
     # 生成授信明细
     loan_detail_id1 = jiase.loan_apply_prepare_create(loan_apply_id)
     jiase.loan_detail_self_save(loan_apply_id, loan_detail_id1,'yjtest_种植贷',self_limit='100000')
     jiase.loan_detail_guarantor_save(loan_apply_id, loan_detail_id1,'yjtest_种植贷',guarantee_limit='50000')
     # 添加担保方
-    jiase.loan_guarantors_create(loan_detail_id1, cust_enterprise_id,'QY')
+    jiase.loan_guarantors_create(loan_detail_id1, cust_enterprise_id)
 
     # 投资经理提交授信申请
     jiase.loan_apply_submit(loan_apply_id)

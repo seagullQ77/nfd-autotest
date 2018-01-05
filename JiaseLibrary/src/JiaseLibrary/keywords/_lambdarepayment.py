@@ -92,35 +92,35 @@ class _LambdaRepaymentKeywords():
         statusCode = reply_json_dict['statusCode']
         statusDesc = reply_json_dict['statusDesc']
 
-    if statusCode == '0':
-        logger.info("提交成功！statusCode: %s, statusDesc: %s" % (reply_json_dict.get('statusCode'), reply_json_dict.get('statusDesc')))
-        sql = """
-                            SELECT
-                              COUNT(*)
-                            FROM
-                              Repayment_apply
-                            WHERE apply_code = '%s' 
-                              AND lend_code = '%s'
-                              AND status = '%s'
-                              AND cust_id = '%s'
-                              AND inputAmt = '%s'
-                            """ % (
-            applyCode,
-            lendCode,
-            status,
-            custId,
-            amount,
-        )
-        db = LambdaDbCon(self._lambda_db_host, self._lambda_db_user, self._lambda_db_passwd, self._lambda_db_port,
-                         self._lambda_db_charset)
-        db_check_flag = db.check_db(sql)
-        if db_check_flag and satus='AUDITING':
-            logger.info('新增还款申请数据库验证成功')
+        if statusCode == '0':
+            logger.info("提交成功！statusCode: %s, statusDesc: %s" % (reply_json_dict.get('statusCode'), reply_json_dict.get('statusDesc')))
+            sql = """
+                                SELECT
+                                  COUNT(*)
+                                FROM
+                                  Repayment_apply
+                                WHERE apply_code = '%s' 
+                                  AND lend_code = '%s'
+                                  AND status = '%s'
+                                  AND cust_id = '%s'
+                                  AND inputAmt = '%s'
+                                """ % (
+                applyCode,
+                lendCode,
+                status,
+                custId,
+                amount,
+            )
+            db = LambdaDbCon(self._lambda_db_host, self._lambda_db_user, self._lambda_db_passwd, self._lambda_db_port,
+                             self._lambda_db_charset)
+            db_check_flag = db.check_db(sql)
+            if db_check_flag and satus=='AUDITING':
+                logger.info('新增还款申请数据库验证成功')
+            else:
+                raise AssertionError('新增还款申请数据库验证失败 sql:%s' % sql)
+            return 0
         else:
-            raise AssertionError('新增还款申请数据库验证失败 sql:%s' % sql)
-        return 0
-    else:
-        raise Exception( '提交还款失败,错误码:%s,错误信息:%s' % (reply_json_dict.get('statusCode'), reply_json_dict.get('statusDesc')))
+            raise Exception( '提交还款失败,错误码:%s,错误信息:%s' % (reply_json_dict.get('statusCode'), reply_json_dict.get('statusDesc')))
 
 
     # 还款申请审批通过
