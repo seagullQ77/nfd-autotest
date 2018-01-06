@@ -28,12 +28,26 @@ class LambdaDbCon():
         self.connect.select_db('lambda')
         self.cursor.execute(sql)
         db_value = self.cursor.fetchone()[0]
-        self.cursor.close()
-        self.connect.close()
+        # self.cursor.close()
+        # self.connect.close()
         if db_value == value:
             return True
         else:
             return False
+
+    def close(self):
+        self.cursor.close()
+        self.connect.close()
+
+    def exec_sql(self,sql):
+        '''
+        执行sql
+        :param sql:
+        '''
+        self.connect.select_db('lambda')
+        self.cursor.execute(sql)
+        self.connect.commit()
+
 
     def update_sys_user_password(self,account):       
         self.connect.select_db('lambda')
@@ -41,7 +55,7 @@ class LambdaDbCon():
         # query_sql = "SELECT * FROM `sys_user` WHERE account='%s'" %en_account
         update_sql = "UPDATE sys_user SET user_password='$2a$11$P3GPFasiq.D/2QJhODL73uvfSyxKfu6SMftQp8w946YpDMOiIgPCy' WHERE account ='%s'" %en_account
         self.cursor.execute(update_sql)
-        self.connect.commit()    
+        self.connect.commit()
         self.cursor.close()
         self.connect.close()
 

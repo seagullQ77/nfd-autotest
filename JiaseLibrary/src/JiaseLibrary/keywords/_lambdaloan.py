@@ -10,32 +10,6 @@ class _LambdaLoanKeywords():
     def __init__(self):
         pass
 
-    def query_custom_info(self,cust_name, cust_type):
-        '''
-        根据客户名称与客户类型查询客户信息
-        :param cust_name:客户名称
-        :param cust_type:客户类型 GR:个人/QY:企业
-        :return:客户信息dict
-        '''
-        if cust_type == 'GR':
-            url = '%s/cust/infos/personal/list' % self._lambda_url
-        if cust_type == 'QY':
-            url = '%s/cust/infos/enterprise/list' % self._lambda_url
-
-        params = {"cust_name": cust_name}
-        res = self._request.get(url, params=params,headers=self._headers)
-        ret = json.loads(res.content.decode())
-        if ret.get('statusCode') == '0':
-            logger.info('查询客户列表成功')
-            for cust_info in ret.get('list'):
-                base_info = cust_info.get('baseInfo')
-                if base_info.get('custName') == cust_name:
-                    return cust_info
-            else:
-                raise AssertionError('客户列表中找不到对应的客户:%s %s' % (cust_name, cust_type))
-        else:
-            raise AssertionError('查询客户列表失败,错误码:%s,错误信息:%s' % (ret.get('statusCode'), ret.get('statusDesc')))
-
     def query_prod_id(self,prod_name):
         '''
         根据产品名称查询产品id
@@ -234,16 +208,18 @@ class _LambdaLoanKeywords():
             else:
                 raise AssertionError('更新%s失败,产品明细id:%s,错误码:%s,错误信息:%s' % (service_fees_item_name,loan_detail_id,ret.get('statusCode'), ret.get('statusDesc')))
 
-    def loan_apply_create(self,cust_name, cust_type):
+    def loan_apply_create(self,cust_id):
         '''
         新增授信
-        :param cust_name:客户名称
-        :param cust_type:
+        :param cust_id:客户id
+        :param cust_type:客户类型
         :return: 授信id
         '''
-        cust_info = self.query_custom_info(cust_name, cust_type)
+        cust_info = self.custom_view(cust_id)
         cust_name_full = cust_info.get('baseInfo').get('custName') + '(' + cust_info.get('baseInfo').get('idCode') + ')'
         cust_id = cust_info.get('baseInfo').get('id')
+        cust_type = cust_info.get('baseInfo').get('custType')
+
         url = '%s/loan/apply/add/create' % self._lambda_url
         data = {
             "custType": cust_type,
@@ -258,6 +234,7 @@ class _LambdaLoanKeywords():
             sql = "SELECT COUNT(*) FROM loan_credit_apply WHERE id='%s' AND cust_id='%s'" %(loan_apply_id,cust_id)
             db = LambdaDbCon(self._lambda_db_host,self._lambda_db_user,self._lambda_db_passwd,self._lambda_db_port,self._lambda_db_charset)
             db_check_flag = db.check_db(sql)
+            db.close()
             if db_check_flag:
                 logger.info('新增授信数据库验证成功')
                 return loan_apply_id
@@ -274,12 +251,9 @@ class _LambdaLoanKeywords():
         :param cust_id:客户id
         :return:授信明细id
         '''
-        loan_apply_cust_info = self.loan_apply_cust_info_query(loan_apply_id)
-        cust_name = loan_apply_cust_info.get('cust_name')
-        cust_type = loan_apply_cust_info.get('cust_type')
+        loan_apply_cust_info = self.loan_apply_view(loan_apply_id)
+        cust_id = loan_apply_cust_info.get('custId')
 
-        cust_info = self.query_custom_info(cust_name, cust_type)
-        cust_id = cust_info.get('baseInfo').get('id')
         url = '%s/loan/credit/details/prepare_create' % self._lambda_url
         params = {
             "loanApplyId": loan_apply_id,
@@ -293,6 +267,7 @@ class _LambdaLoanKeywords():
             sql = "SELECT count(*) FROM loan_credit_detail WHERE cust_id ='%s' AND loan_apply_id='%s' AND id='%s'" %(cust_id,loan_apply_id,loan_detail_id)
             db = LambdaDbCon(self._lambda_db_host,self._lambda_db_user,self._lambda_db_passwd,self._lambda_db_port,self._lambda_db_charset)
             db_check_flag = db.check_db(sql)
+            db.close()
             if db_check_flag:
                 logger.info('新增授信明细数据库验证成功')
                 return loan_detail_id
@@ -389,6 +364,7 @@ class _LambdaLoanKeywords():
                         % (str(agreement_id),str(loan_apply_id),str(loan_detail_id),str(cust_id),str(bank_id),str(apply_type))
                 db = LambdaDbCon(self._lambda_db_host,self._lambda_db_user,self._lambda_db_passwd,self._lambda_db_port,self._lambda_db_charset)
                 db_check_flag = db.check_db(sql)
+                db.close()
                 if db_check_flag:
                     logger.info('新增授信明细数据库验证成功')
                 else:
@@ -426,6 +402,7 @@ class _LambdaLoanKeywords():
         ret = json.loads(res.content.decode())
         if ret.get('statusCode') == '0':
             logger.info('自贷额度暂存新增账户约定成功')
+
         else:
             raise AssertionError('自贷额度暂存新增账户约定失败,错误码:%s,错误信息:%s' % (ret.get('statusCode'), ret.get('statusDesc')))
 
@@ -444,13 +421,10 @@ class _LambdaLoanKeywords():
             withhold:是否代扣
         :return:
         '''
+        loan_apply_cust_info = self.loan_apply_view(loan_apply_id)
+        cust_id = loan_apply_cust_info.get('custId')
+        cust_type = loan_apply_cust_info.get('custType')
 
-        loan_apply_cust_info = self.loan_apply_cust_info_query(loan_apply_id)
-        cust_name = loan_apply_cust_info.get('cust_name')
-        cust_type = loan_apply_cust_info.get('cust_type')
-
-        cust_info = self.query_custom_info(cust_name, cust_type)
-        cust_id = cust_info.get('baseInfo').get('id')
         prod_id = self.query_prod_id(prod_name)
         effectived_credit_config = self.effectived_credit_config_query(cust_type, prod_id, loan_apply_id, loan_detail_id)
         prod_credit_config = effectived_credit_config.get('prodCreditConfig')
@@ -662,6 +636,7 @@ class _LambdaLoanKeywords():
                     )
             db = LambdaDbCon(self._lambda_db_host,self._lambda_db_user,self._lambda_db_passwd,self._lambda_db_port,self._lambda_db_charset)
             db_check_flag = db.check_db(sql)
+            db.close()
             if db_check_flag:
                 logger.info('保存自贷额度数据库验证成功')
             else:
@@ -685,13 +660,10 @@ class _LambdaLoanKeywords():
             repayment_type:还款方式
         :return:
         '''
+        loan_apply_cust_info = self.loan_apply_view(loan_apply_id)
+        cust_id = loan_apply_cust_info.get('custId')
+        cust_type = loan_apply_cust_info.get('custType')
 
-        loan_apply_cust_info = self.loan_apply_cust_info_query(loan_apply_id)
-        cust_name = loan_apply_cust_info.get('cust_name')
-        cust_type = loan_apply_cust_info.get('cust_type')
-
-        cust_info = self.query_custom_info(cust_name, cust_type)
-        cust_id = cust_info.get('baseInfo').get('id')
         prod_id = self.query_prod_id(prod_name)
         effectived_credit_config = self.effectived_credit_config_query(cust_type, prod_id, loan_apply_id, loan_detail_id)
         prod_credit_config = effectived_credit_config.get('prodCreditConfig')
@@ -1090,19 +1062,6 @@ class _LambdaLoanKeywords():
                 loan_apply_task_id = loan_apply_info.get('taskId')
                 return loan_apply_task_id
 
-    def loan_apply_cust_info_query(self,loan_apply_id):
-        '''
-        查询授信授信客户信息
-        :param loan_apply_id:授信id
-        :return:授信客户信息dict
-        '''
-        loan_apply_info = self.loan_apply_view(loan_apply_id)
-        loan_apply_cust_info =  {
-                                'cust_name':loan_apply_info.get('custName'),
-                                'cust_type':loan_apply_info.get('custType')
-                                }
-        return loan_apply_cust_info
-
     def loan_task_claim(self,loan_apply_id):
         '''
         领取授信任务
@@ -1330,12 +1289,14 @@ class _LambdaLoanKeywords():
         else:
             raise AssertionError('授信业务收回失败,错误码:%s,错误信息:%s' % (ret.get('statusCode'), ret.get('statusDesc')))
 
-    def loan_guarantors_query(self,cust_name):
+    def loan_guarantors_query(self,cust_id):
         '''
         查询担保方相关信息
         :param cust_name:客户名
         :return:担保方相关信息dict
         '''
+        cust_info = self.custom_view(cust_id)
+        cust_name = cust_info.get('baseInfo').get('custName')
         url = '%s/loan/guarantors/queryGuarantorCust' % self._lambda_url
         params =   {
                     "name":cust_name
@@ -1346,7 +1307,7 @@ class _LambdaLoanKeywords():
             logger.info('查询担可用担保方成功')
             guarantors_info_list = ret.get('data')
             for guarantors_info in guarantors_info_list:
-                if guarantors_info.get('custName') == cust_name:
+                if guarantors_info.get('custName') == cust_name and guarantors_info.get('id') == cust_id:
                     return guarantors_info
             else:
                 raise AssertionError('输入的客户在可用担保方中查询不到')
@@ -1354,7 +1315,7 @@ class _LambdaLoanKeywords():
         else:
             raise AssertionError('查询可用担保方失败,错误码:%s,错误信息:%s' % (ret.get('statusCode'), ret.get('statusDesc')))
 
-    def loan_guarantors_create(self,loan_detail_id,guarantors_cust_name,**kwargs):
+    def loan_guarantors_create(self,loan_detail_id,guarantors_cust_id,**kwargs):
         '''
         新增担保方
         :param loan_detail_id:授信明细id
@@ -1365,8 +1326,9 @@ class _LambdaLoanKeywords():
             is_provide_guarantee:是否对担保项下借款主体提供担保
         :return:
         '''
-        guarantors_info = self.loan_guarantors_query(guarantors_cust_name)
+        guarantors_info = self.loan_guarantors_query(guarantors_cust_id)
         guarantors_cust_id = guarantors_info.get('id')
+        guarantors_cust_name = guarantors_info.get('custName')
         guarantors_cust_code = guarantors_info.get('custCode')
 
         loan_detail_info = self.loan_detail_view(loan_detail_id)
@@ -1435,6 +1397,7 @@ class _LambdaLoanKeywords():
                     )
             db = LambdaDbCon(self._lambda_db_host, self._lambda_db_user, self._lambda_db_passwd, self._lambda_db_port,self._lambda_db_charset)
             db_check_flag = db.check_db(sql)
+            db.close()
             if db_check_flag:
                 logger.info('新增授信担保方数据库验证成功')
             else:
