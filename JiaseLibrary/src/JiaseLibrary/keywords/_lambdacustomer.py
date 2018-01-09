@@ -4,7 +4,6 @@ import random
 import datetime
 from functools import reduce
 from robot.api import logger
-from utils.lambda_db import LambdaDbCon
 from utils.lambda_encrpt import LambdaEncrpt
 
 class _LambdaCustomerKeywords():
@@ -57,8 +56,6 @@ class _LambdaCustomerKeywords():
             logger.info('新增个人客户成功:%s' %cust_name)
             cust_id = ret.get('data')
 
-            db = LambdaDbCon(self._lambda_db_host, self._lambda_db_user, self._lambda_db_passwd, self._lambda_db_port,
-                             self._lambda_db_charset)
             sql =   """
                     SELECT count(*) FROM cust_info_base WHERE
                     cust_name = '%s' 
@@ -73,14 +70,13 @@ class _LambdaCustomerKeywords():
                     LambdaEncrpt(self._lambda_db_env)._encrypt(id_code),
                     reduce(lambda x, y:int(x) + int(y), cust_kind_str.split(','))
                     )
-            db_check_flag = db.check_db(sql)
+            db_check_flag = self.db.check_db(sql)
             if db_check_flag:
                 logger.info('新增个人客户数据库验证成功')
             else:
                 raise AssertionError('新增个人客户数据库验证失败 sql:%s' % sql)
             sql =   "SELECT count(*) FROM cust_info_personal WHERE id = '%s'"  % cust_id
-            db_check_flag = db.check_db(sql)
-            db.close()
+            db_check_flag = self.db.check_db(sql)
             if db_check_flag:
                 logger.info('新增个人客户数据库验证成功')
             else:
@@ -285,8 +281,6 @@ class _LambdaCustomerKeywords():
         ret = json.loads(res.content.decode())
         if ret.get('statusCode') == '0':
             logger.info('%s新增个人客户详细信息成功' % cust_name)
-            db = LambdaDbCon(self._lambda_db_host, self._lambda_db_user, self._lambda_db_passwd, self._lambda_db_port,
-                             self._lambda_db_charset)
             sql =   """
                     SELECT COUNT(*) FROM cust_info_personal WHERE
                     id = '%s' 
@@ -327,8 +321,7 @@ class _LambdaCustomerKeywords():
                     work_year,
                     work_desc
                     )
-            db_check_flag = db.check_db(sql)
-            db.close()
+            db_check_flag = self.db.check_db(sql)
             if db_check_flag:
                 logger.info('新增个人客户数据库验证成功')
             else:
@@ -412,8 +405,6 @@ class _LambdaCustomerKeywords():
         ret = json.loads(res.content.decode())
         if ret.get('statusCode') == '0':
             logger.info('%s新增企业客户详细信息成功' % cust_name)
-            db = LambdaDbCon(self._lambda_db_host, self._lambda_db_user, self._lambda_db_passwd, self._lambda_db_port,
-                             self._lambda_db_charset)
             sql =   """
                     SELECT COUNT(*) FROM cust_info_enterprise WHERE
                     id = '%s' 
@@ -464,8 +455,8 @@ class _LambdaCustomerKeywords():
                     business_scope,
                     remark
                     )
-            db_check_flag = db.check_db(sql)
-            db.close()
+            db_check_flag = self.db.check_db(sql)
+
             if db_check_flag:
                 logger.info('新增个人客户数据库验证成功')
             else:
@@ -539,9 +530,7 @@ class _LambdaCustomerKeywords():
                 cust_business_id,
                 '1' if is_main else '0'
                 )
-            db = LambdaDbCon(self._lambda_db_host, self._lambda_db_user, self._lambda_db_passwd, self._lambda_db_port,self._lambda_db_charset)
-            db_check_flag = db.check_db(sql)
-            db.close()
+            db_check_flag = self.db.check_db(sql)
             if db_check_flag:
                 logger.info('新增主营业务数据库验证成功')
             else:
@@ -585,10 +574,7 @@ class _LambdaCustomerKeywords():
         if ret.get('statusCode') == '0':
             logger.info('新增种植类经营信息成功')
             sql = "SELECT COUNT(*) FROM cust_business_plant_new WHERE business_id = '%s'" % cust_business_id
-            db = LambdaDbCon(self._lambda_db_host, self._lambda_db_user, self._lambda_db_passwd, self._lambda_db_port,
-                             self._lambda_db_charset)
-            db_check_flag = db.check_db(sql)
-            db.close()
+            db_check_flag = self.db.check_db(sql)
             if db_check_flag:
                 logger.info('新增种植类经营信息数据库验证成功')
             else:
@@ -609,10 +595,7 @@ class _LambdaCustomerKeywords():
         res = self._request.post(url, headers=self._headers,data=json.dumps(payload))
         ret = json.loads(res.content.decode())
         sql = "SELECT COUNT(*) FROM cust_business_product_new WHERE business_id = '%s'" % cust_business_id
-        db = LambdaDbCon(self._lambda_db_host, self._lambda_db_user, self._lambda_db_passwd, self._lambda_db_port,
-                         self._lambda_db_charset)
-        db_check_flag = db.check_db(sql)
-        db.close()
+        db_check_flag = self.db.check_db(sql)
         if db_check_flag:
             logger.info('新增生产类/贸易类经营信息数据库验证成功')
         else:
@@ -688,10 +671,7 @@ class _LambdaCustomerKeywords():
                     1 if is_corporate_account == 'true' else 0,
                     bank_number
                     )
-            db = LambdaDbCon(self._lambda_db_host, self._lambda_db_user, self._lambda_db_passwd, self._lambda_db_port,
-                             self._lambda_db_charset)
-            db_check_flag = db.check_db(sql)
-            db.close()
+            db_check_flag = self.db.check_db(sql)
             if db_check_flag:
                 logger.info('新增银行卡数据库验证成功')
             else:
@@ -755,11 +735,9 @@ class _LambdaCustomerKeywords():
         :return:
         '''
         sql = "UPDATE cust_info_base SET cust_status='JD',sync_status='SUCCESS' WHERE id='%s' AND cust_type='%s'" % (cust_id, cust_type)
-        db = LambdaDbCon(self._lambda_db_host, self._lambda_db_user, self._lambda_db_passwd, self._lambda_db_port,self._lambda_db_charset)
-        db.exec_sql(sql)
-        db.close()
+        self.db.exec_sql(sql)
+
         if cust_type == 'GR':
             sql = "UPDATE `cust_info_personal` SET id_check_result = 'PASS' WHERE id = '%s'" % cust_id
-            db = LambdaDbCon(self._lambda_db_host, self._lambda_db_user, self._lambda_db_passwd, self._lambda_db_port,self._lambda_db_charset)
-            db.exec_sql(sql)
+            self.db.exec_sql(sql)
 
