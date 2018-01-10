@@ -140,8 +140,47 @@ class _LambdaRepaymentKeywords():
         
     # 还款申请审批撤销
     # repayment_id: 还款申请的id
-    def repayment_apply_aduit_cancel(self,repayment_id):
-        pass
+    def repayment_apply_aduit_cancel(self,lend_code):
+        task_id,procinst_id = self._get_task_list( page_no=1,page_size=100,lend_code = lend_code)
+        url = '%s/repayment/apply/cancel' %self._lambda_url
+        payload = {
+            "taskId":task_id,
+            "procInstId":procinst_id
+        }
+        res = self._request.post(url,data=payload)
+        response = res.content.decode()
+        status = json.loads(response).get("statusCode")
+        statusDesc = json.loads(response).get("statusDesc")
+        if status == '0':
+            logger.info("还款申请撤销成功")
+        else:
+            logger.info(statusDesc)
+            raise AssertionError(statusDesc)
+
+    def _get_task_list(self, page_no=1,page_size=100,lend_code = None):
+        url = '%s/workbench/repayApply/todoList' % self._lambda_url
+        payload = {
+            "pageNo": page_no,
+            "pageSize": page_size
+        }
+        res = self._request.post(url, headers=self._headers, data=json.dumps(payload))
+        response = res.content.decode()
+        if json.loads(response).get("statusCode") == '0':
+            logger.info("还款任务列表查询成功")
+            list = json.loads(response).get("list")
+            for i in list:
+                if str(i.get("iouCode")) == str(lend_code):
+                    task_id = i.get("taskId")
+                    procinst_id = i.get("procInstId")
+                    break
+            else:
+                raise AssertionError("还款任务列表中找不到对应的task_id")
+            return task_id , procinst_id
+        else:
+            raise AssertionError(
+                '还款任务列表查询失败,错误码:%s,错误信息:%s' % (response.get('statusCode'), response.get('statusDesc')))
+
+
         
     # 还款申请审批回收
     # repayment_id: 还款申请的id
@@ -329,6 +368,8 @@ class _LambdaRepaymentKeywords():
     def _get_prepay_task_list(self,page_no=1,page_size=100):
 
         '''
+
+
                        领取任务
                        :param page_no:第几页
                        :param page_size:每页数量
