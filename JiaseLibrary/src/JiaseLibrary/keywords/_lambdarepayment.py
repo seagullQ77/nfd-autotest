@@ -144,6 +144,7 @@ class _LambdaRepaymentKeywords():
         task_id,procinst_id = self._get_task_list( page_no=1,page_size=100,lend_code = lend_code)
         url = '%s/repayment/apply/cancel' %self._lambda_url
         payload = {
+
             "taskId":task_id,
             "procInstId":procinst_id
         }
