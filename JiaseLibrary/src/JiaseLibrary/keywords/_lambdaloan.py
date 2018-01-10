@@ -2,7 +2,6 @@
 import json
 import random
 from robot.api import logger
-from utils.lambda_db import LambdaDbCon
 
 
 class _LambdaLoanKeywords():
@@ -232,9 +231,7 @@ class _LambdaLoanKeywords():
             logger.info('新增授信成功')
             loan_apply_id = ret.get('data').get('id')
             sql = "SELECT COUNT(*) FROM loan_credit_apply WHERE id='%s' AND cust_id='%s'" %(loan_apply_id,cust_id)
-            db = LambdaDbCon(self._lambda_db_host,self._lambda_db_user,self._lambda_db_passwd,self._lambda_db_port,self._lambda_db_charset)
-            db_check_flag = db.check_db(sql)
-            db.close()
+            db_check_flag = self.db.check_db(sql)
             if db_check_flag:
                 logger.info('新增授信数据库验证成功')
                 return loan_apply_id
@@ -265,9 +262,7 @@ class _LambdaLoanKeywords():
             logger.info('生成授信明细id成功')
             loan_detail_id = ret.get('data').get('id')
             sql = "SELECT count(*) FROM loan_credit_detail WHERE cust_id ='%s' AND loan_apply_id='%s' AND id='%s'" %(cust_id,loan_apply_id,loan_detail_id)
-            db = LambdaDbCon(self._lambda_db_host,self._lambda_db_user,self._lambda_db_passwd,self._lambda_db_port,self._lambda_db_charset)
-            db_check_flag = db.check_db(sql)
-            db.close()
+            db_check_flag = self.db.check_db(sql)
             if db_check_flag:
                 logger.info('新增授信明细数据库验证成功')
                 return loan_detail_id
@@ -362,9 +357,7 @@ class _LambdaLoanKeywords():
                 logger.info('更新账户约定成功')
                 sql = "SELECT COUNT(*) FROM contract_agreement  WHERE id='%s' AND loan_apply_id='%s' AND loan_detail_id='%s' AND cust_id='%s' AND bank_id='%s' and apply_type='%s'" \
                         % (str(agreement_id),str(loan_apply_id),str(loan_detail_id),str(cust_id),str(bank_id),str(apply_type))
-                db = LambdaDbCon(self._lambda_db_host,self._lambda_db_user,self._lambda_db_passwd,self._lambda_db_port,self._lambda_db_charset)
-                db_check_flag = db.check_db(sql)
-                db.close()
+                db_check_flag = self.db.check_db(sql)
                 if db_check_flag:
                     logger.info('新增授信明细数据库验证成功')
                 else:
@@ -634,9 +627,7 @@ class _LambdaLoanKeywords():
                     loan_purpose_type,
                     loan_payment_mode
                     )
-            db = LambdaDbCon(self._lambda_db_host,self._lambda_db_user,self._lambda_db_passwd,self._lambda_db_port,self._lambda_db_charset)
-            db_check_flag = db.check_db(sql)
-            db.close()
+            db_check_flag = self.db.check_db(sql)
             if db_check_flag:
                 logger.info('保存自贷额度数据库验证成功')
             else:
@@ -1395,9 +1386,7 @@ class _LambdaLoanKeywords():
                     '0' if is_main_guarantor == "false" else '1',
                     '0' if is_provide_guarantee == "false" else '1'
                     )
-            db = LambdaDbCon(self._lambda_db_host, self._lambda_db_user, self._lambda_db_passwd, self._lambda_db_port,self._lambda_db_charset)
-            db_check_flag = db.check_db(sql)
-            db.close()
+            db_check_flag = self.db.check_db(sql)
             if db_check_flag:
                 logger.info('新增授信担保方数据库验证成功')
             else:
@@ -1422,8 +1411,7 @@ class _LambdaLoanKeywords():
         if ret.get('statusCode') == '0':
             logger.info('删除授信担保方成功')
             sql = "SELECT COUNT(*) FROM loan_guarantor_info WHERE loan_detail_id = '%s' AND  cust_name = '%s'" %(loan_detail_id,cust_name)
-            db = LambdaDbCon(self._lambda_db_host,self._lambda_db_user,self._lambda_db_passwd,self._lambda_db_port,self._lambda_db_charset)
-            db_check_flag = db.check_db(sql,0)
+            db_check_flag = self.db.check_db(sql,0)
             if db_check_flag:
                 logger.info('删除授信担保方数据库验证成功')
             else:
