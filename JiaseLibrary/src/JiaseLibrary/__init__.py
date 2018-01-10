@@ -88,6 +88,27 @@ if __name__ == '__main__':
     jiase = JiaseLibrary()
     jiase.login_lambda(role='lambda_invest_manager')
 
+    cust_personal_id1 = jiase.custom_personal_create(cust_name='test11个人')
+    cust_personal_id2 = jiase.custom_personal_create(cust_name='test12个人')
+    cust_personal_id3 = jiase.custom_personal_create(cust_name='test13个人')
+    cust_personal_id4 = jiase.custom_personal_create(cust_name='test14个人')
+    group_id1 = jiase.custom_group_create(cust_personal_id1)
+    jiase.custom_group_add_member(group_id1,cust_personal_id2)
+    jiase.custom_group_update_main_borrower(group_id1,cust_personal_id2)
+    jiase.custom_group_delete_member(group_id1,cust_personal_id1)
+    jiase.custom_group_delete_member(group_id1,cust_personal_id2)
+    jiase.custom_group_add_member(group_id1, cust_personal_id1)
+    jiase.custom_group_add_member(group_id1, cust_personal_id2)
+
+    group_id2 = jiase.custom_group_create(cust_personal_id3)
+    jiase.custom_group_add_member(group_id2,cust_personal_id4)
+    jiase.custom_group_freeze(group_id1,group_id2)
+    jiase.custom_group_unfreeze(group_id2, group_id2)
+
+    jiase.custom_group_delete_member(group_id1,cust_personal_id1)
+    jiase.custom_group_delete_member(group_id1,cust_personal_id2)
+    jiase.custom_group_delete_member(group_id2,cust_personal_id3)
+    jiase.custom_group_delete_member(group_id2,cust_personal_id4)
 
     cust_personal_id = jiase.custom_personal_create(cust_name='test10个人')
     cust_enterprise_id = jiase.custom_enterprise_create(cust_personal_id,cust_name='test10企业')

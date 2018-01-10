@@ -11,12 +11,14 @@ class _LambdaCustomerKeywords():
     def __init__(self):        
         pass
 
-    # 新增客户
-    # cust_kind:客户类型，若不传，则默认都选择,参数类型:'HZS|DBKH|DKKH' 代表 '合作商|担保客户|贷款客户' 
-    # cust_name:客户姓名,若不传,则随机生成
-    # id_code:客户身份证号,若不传,则随机生成 
-    # 返回:cust_id 客户id,在后面的授信管理、提款管理都会用到
+
     def custom_personal_create(self,cust_kind=None,cust_name=None,id_code=None):
+        '''
+        :param cust_kind:客户类型，若不传，则默认都选择,参数类型:'HZS|DBKH|DKKH' 代表 '合作商|担保客户|贷款客户'
+        :param cust_name:客户名
+        :param id_code:证件号
+        :return:客户id
+        '''
         url = '%s/cust/infos/personal/create' % self._lambda_url
         if cust_name is None:
             cust_name = self._faker.name_wuxia()
@@ -91,6 +93,14 @@ class _LambdaCustomerKeywords():
             raise AssertionError('新增个人客户失败:错误码:%s,错误信息:%s' % (ret.get('statusCode'), ret.get('statusDesc')))
 
     def custom_enterprise_create(self,cust_personal_id,cust_kind=None, cust_name=None, id_code=None):
+        '''
+        新增企业客户
+        :param cust_personal_id:个人客户id
+        :param cust_kind:客户类型
+        :param cust_name:客户名称
+        :param id_code:证件号
+        :return:客户id
+        '''
         url = '%s/cust/infos/enterprise/create' % self._lambda_url
         if not cust_name:
             cust_name = self._faker.name_wuxia() + '企业'
@@ -134,6 +144,7 @@ class _LambdaCustomerKeywords():
             return cust_id
         else:
             raise AssertionError('新增企业客户失败:错误码:%s,错误信息:%s' % (ret.get('statusCode'), ret.get('statusDesc')))
+
 
     def custom_personal_view(self,cust_id):
         '''
@@ -185,8 +196,6 @@ class _LambdaCustomerKeywords():
         except:
             cust_info = self.custom_enterprise_view(cust_id)
         return cust_info
-
-
 
     def custom_query(self,cust_name,cust_type,cust_id):
         '''
@@ -741,3 +750,187 @@ class _LambdaCustomerKeywords():
             sql = "UPDATE `cust_info_personal` SET id_check_result = 'PASS' WHERE id = '%s'" % cust_id
             self.db.exec_sql(sql)
 
+    def custom_group_create(self,cust_id):
+        '''
+        新增关联客户组
+        :param cust_id:客户id
+        :return:关联客户id
+        '''
+
+        cust_name = self.custom_group_member_is_enable(cust_id)
+        group_type = random.choice(['GROUP','COMPANY','RELATIVES','BUSINESS_CONTACT','BORROWER_GROUP'])
+        url = '%s/cust/group/createGroup' % self._lambda_url
+        payload =   {
+                    "id":"",
+                    "groupType":group_type,
+                    "mainBorrowerId":cust_id,
+                    "custName":cust_name
+                    }
+        res = self._request.post(url,headers=self._headers,data=json.dumps(payload))
+        ret = json.loads(res.content.decode())
+        if ret.get('statusCode') == '0':
+            logger.info('新增关联客户成功')
+            group_id = ret.get('data').get('id')
+            return group_id
+        else:
+            raise AssertionError('新增关联客户失败:错误码:%s,错误信息:%s' % (ret.get('statusCode'), ret.get('statusDesc')))
+
+    def custom_group_add_member(self,group_id,cust_id):
+        '''
+        添加关联组成员
+        :param group_id:关联客户组id
+        :param cust_id:客户id
+        :return:
+        '''
+        cust_name = self.custom_group_member_is_enable(cust_id)
+        relation = random.choice(['HOLD_INTEREST','LEGAL_PERSON'])
+        url = '%s/cust/group/createMember' % self._lambda_url
+        payload =   {
+                    "id":"",
+                    "relationCustId":cust_id,
+                    "custName":cust_name,
+                    "custType":"",
+                    "mobilePhone":"",
+                    "idType":"",
+                    "idCode":"",
+                    "relation":relation,
+                    "groupId":group_id
+                    }
+        res = self._request.post(url,headers=self._headers,data=json.dumps(payload))
+        ret = json.loads(res.content.decode())
+        if ret.get('statusCode') == '0':
+            logger.info('新增关联客户成员成功')
+        else:
+            raise AssertionError('新增关联客户成员失败:错误码:%s,错误信息:%s' % (ret.get('statusCode'), ret.get('statusDesc')))
+
+    def custom_group_delete_member(self,group_id,cust_id):
+        '''
+        添加关联组成员
+        :param group_id:关联客户组id
+        :param cust_id:客户id
+        :return:
+        '''
+        relation_id = self.custom_group_member_relation_id_get(group_id,cust_id)
+        url = '%s/cust/group/deleteMember' % self._lambda_url
+        payload =   {
+                    "relationId":relation_id,
+                    }
+        res = self._request.post(url,data=payload)
+        ret = json.loads(res.content.decode())
+        if ret.get('statusCode') == '0':
+            logger.info('删除关联客户成员成功')
+        else:
+            raise AssertionError('删除关联客户成员失败:错误码:%s,错误信息:%s' % (ret.get('statusCode'), ret.get('statusDesc')))
+
+    def custom_group_update_main_borrower(self,group_id,cust_id):
+        '''
+        设置关联客户组主借款人
+        :param group_id:关联客户组id
+        :param cust_id:客户id
+        :return:
+        '''
+        relation_id = self.custom_group_member_relation_id_get(group_id,cust_id)
+        url = '%s/cust/group/updateMainBorrower' % self._lambda_url
+        payload =   {
+                    "groupId":group_id,
+                    "mainRelationId":relation_id
+                    }
+        res = self._request.post(url,data=payload)
+        ret = json.loads(res.content.decode())
+        if ret.get('statusCode') == '0':
+            logger.info('设置关联客户主借款人成功')
+        else:
+            raise AssertionError('设置关联客户主借款人失败:错误码:%s,错误信息:%s' % (ret.get('statusCode'), ret.get('statusDesc')))
+
+    def custom_group_member_relation_id_get(self,group_id,cust_id):
+        '''
+        根据客户id查询关联客户关联id
+        :param group_id:关联客户组id
+        :return:关联客户关联id
+        '''
+        url = '%s/cust/group/viewGroup' % self._lambda_url
+        params =    {
+                    "id":group_id
+                    }
+
+        res = self._request.get(url,headers=self._headers,params=params)
+        ret = json.loads(res.content.decode())
+        if ret.get('statusCode') == '0':
+            logger.info('查看关联客户信息成功')
+            cust_group_member_list = ret.get('data').get('memberList')
+            for cust_group_member in cust_group_member_list:
+                if cust_group_member.get('relationCustId') == cust_id:
+                    return cust_group_member.get('id')
+            else:
+                raise AssertionError('对应的客户不在关联组内.cust_id:%s' % cust_id)
+        else:
+            raise AssertionError('查看关联客户信息成功失败:错误码:%s,错误信息:%s' % (ret.get('statusCode'), ret.get('statusDesc')))
+
+    def custom_group_query(self,cust_name=None):
+        '''
+        查询可用的关联的客户列表
+        :param cust_name:客户名
+        :return:可用的关联的客户列表
+        '''
+        url = '%s/cust/group/queryCust' % self._lambda_url
+        params =    {
+                    "custName":cust_name,
+                    "isMainBorrower":"true"
+                    }
+
+        res = self._request.get(url,headers=self._headers,params=params)
+        ret = json.loads(res.content.decode())
+        if ret.get('statusCode') == '0':
+            logger.info('查询可用关联的客户列表成功')
+            return ret.get('data')
+        else:
+            raise AssertionError('查询可用关联的客户列表失败:错误码:%s,错误信息:%s' % (ret.get('statusCode'), ret.get('statusDesc')))
+
+    def custom_group_member_is_enable(self,cust_id):
+        '''
+        查询客户是否可用的关联客户
+        :param cust_id:
+        :return:客户名
+        '''
+        custom_group_member_list = self.custom_group_query()
+        for custom_group_member in custom_group_member_list:
+            if custom_group_member.get('id') == cust_id:
+                return custom_group_member.get('custName')
+        else:
+            raise AssertionError('可用关联客户列表中没有找到对应的客户,cust_id:%s' % cust_id)
+
+    def custom_group_freeze(self,*args):
+        '''
+        冻结关联客户
+        :param args:关联客户组id,支持输入多个
+        :return:
+        '''
+        group_ids = ','.join(map(str,args))
+        url = '%s/cust/group/freezeGroup' % self._lambda_url
+        payload =   {
+                    "groupIds":group_ids
+                    }
+        res = self._request.post(url,data=payload)
+        ret = json.loads(res.content.decode())
+        if ret.get('statusCode') == '0':
+            logger.info('冻结关联客户成功')
+        else:
+            raise AssertionError('冻结关联客户失败:错误码:%s,错误信息:%s' % (ret.get('statusCode'), ret.get('statusDesc')))
+
+    def custom_group_unfreeze(self,*args):
+        '''
+        冻结关联客户
+        :param args:关联客户组id,支持输入多个
+        :return:
+        '''
+        group_ids = ','.join(map(str,args))
+        url = '%s/cust/group/unFreezeGroup' % self._lambda_url
+        payload =   {
+                    "groupIds":group_ids
+                    }
+        res = self._request.post(url,data=payload)
+        ret = json.loads(res.content.decode())
+        if ret.get('statusCode') == '0':
+            logger.info('解冻关联客户成功')
+        else:
+            raise AssertionError('解冻关联客户失败:错误码:%s,错误信息:%s' % (ret.get('statusCode'), ret.get('statusDesc')))
