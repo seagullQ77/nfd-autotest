@@ -16,7 +16,8 @@ print (myfaker.phone_number())#生成一个随机电话号码
 # print (myfaker.mac_address())
 print (myfaker.company())#随机生成一个公司名称
 # print (myfaker.name())#随机生成一个姓名
-# print (myfaker.corporate_code()) #随机生成一个企业营业执照号码print (myfaker.organization_code())#随机生成一个符合校验规则的组织机构代码
+print (myfaker.corporate_code()) #随机生成一个企业营业执照号码
+print (myfaker.organization_code())#随机生成一个符合校验规则的组织机构代码
 
 # print (myfaker.address()) #随机生成一个地址
 # print (myfaker.text()) #随机生成一段文本

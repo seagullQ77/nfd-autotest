@@ -42,5 +42,5 @@ class LambdaEncrpt():
 
 if __name__ == '__main__':
     pc = LambdaEncrpt('lambda_test')
-    print(pc._encrypt('410825199204257544'))
+    print(pc._encrypt('ces1231231c12'))
     print(pc._decrypt('/jBhRV13uDG7QoFwDrqCHyl/SCVzvVOJxCUQyffgnME='))

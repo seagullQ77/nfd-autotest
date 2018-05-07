@@ -15,20 +15,23 @@ class _LambdaSysAuthKeywords():
        role:用配置文件中的lambda 角色登录,传入参数:lambda_invest_manager,role 不为None时,usr参数无效
        usr:登录用户名
        psd:用户名对应密码
-       usr和psd为空时，默认使用配置文件里的超级管理员登录
+       usr和role为None时，默认使用配置文件里的超级管理员登录
+       usr为None，role不为None，读取配置文件中role对应账户登录
+       usr不为None时直接使用usr传入的账户登录
+       psd为None时，使用默认的密码，否则使用传入的值
     '''     
     def login_lambda(self,role=None,usr=None,psd=None):
         #登录前先退出当前登录用户
         self.logout_lambda()
         
-        if role is not None:
-            if hasattr(self, '_%s'%role):
-                usr = getattr(self,'_%s'%role)           
-            else:
-                logger.error('Role: %s not defined in config.cfg,please check again' %role)
-                raise AssertionError('Role: %s not defined in config.cfg,please check again' %role)
-        else:      
-            if usr is None:
+        if usr is None:
+            if role is not None:
+                if hasattr(self, '_%s'%role):
+                    usr = getattr(self,'_%s'%role)           
+                else:
+                    logger.error('Role: %s not defined in config.cfg,please check again' %role)
+                    raise AssertionError('Role: %s not defined in config.cfg,please check again' %role)
+            else:      
                 usr=self._lambda_super_admin
         if psd is None:
             psd = self._lambda_all_psd
