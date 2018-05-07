@@ -8,8 +8,6 @@ import base64
 封装lambda的加密和解密方法
 '''
 
-
-
 class LambdaEncrpt():
     key_dict = {
         'omega_test': 'KOmegaDaiFaNongO',
@@ -27,20 +25,19 @@ class LambdaEncrpt():
         
     def _encrypt(self,source):       
         BS = 16
-        pad_it = lambda s: s + (BS - len(s) % BS) * chr(BS - len(s) % BS)
+        pad_it = lambda s: s + (16 - len(s.encode('utf-8')) % 16) *'\0' if len(s.encode('utf-8'))%16 !=0 else s
         generator = AES.new(self.key, self.mode, self.iv)
         crypt = generator.encrypt(pad_it(source).encode())
         cryptedStr = base64.b64encode(crypt)
         return cryptedStr.decode()
     def _decrypt(self,text):
-        unpad = lambda s : s[0:-ord(s.decode()[-1])]
         generator = AES.new(self.key, self.mode, self.iv)
         recovery = generator.decrypt(base64.b64decode(text))
-        decryStr = unpad(recovery)
-        return decryStr.decode()
+        decryStr = (recovery.decode()).rstrip('\0')
+        return decryStr
 
 
 if __name__ == '__main__':
     pc = LambdaEncrpt('lambda_test')
-    print(pc._encrypt('ces1231231c12'))
-    print(pc._decrypt('/jBhRV13uDG7QoFwDrqCHyl/SCVzvVOJxCUQyffgnME='))
+    print(pc._encrypt('测试1231231c12'))
+    print(pc._decrypt('5pkA+WBlUkYQ5Uvd5JB5DQ=='))
