@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import pymysql
-from utils.lambda_encrpt import LambdaEncrpt
+from .lambda_encrpt import LambdaEncrpt
 
 '''
 封装操作lambda 数据库的相关方法 

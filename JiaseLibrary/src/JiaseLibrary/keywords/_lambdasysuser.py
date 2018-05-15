@@ -3,7 +3,7 @@ import json
 import hashlib
 from robot.api import logger
 from warnings import catch_warnings
-from utils.lambda_db import LambdaDbCon
+from JiaseLibrary.utils.lambda_db import LambdaDbCon
 
 
 class _LambdaSysUserKeywords():

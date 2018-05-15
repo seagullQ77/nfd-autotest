@@ -67,3 +67,8 @@ venv
 venv1
 venv2
 
+
+/.idea/*
+/log.html
+/output.xml
+/report.html

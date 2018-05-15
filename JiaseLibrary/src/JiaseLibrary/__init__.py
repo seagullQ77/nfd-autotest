@@ -3,17 +3,17 @@
 import os
 import requests
 import configparser
-from keywords._lambdasysauth import _LambdaSysAuthKeywords
-from keywords._lambdasysorganize import _LambdaSysOrganizeKeywords
-from keywords._lambdasysuser import _LambdaSysUserKeywords
-from keywords._lambdacustomer import _LambdaCustomerKeywords
-from keywords._lambdaloan import _LambdaLoanKeywords
-from keywords._lambdacontract  import _LambdaContractKeywords
-from keywords._lambdawithdrawal import _LambdaWithdrawalKeywords
-from keywords._lambdarepayment import _LambdaRepaymentKeywords
-from utils.lambda_db import LambdaDbCon
-from utils.lambda_encrpt import LambdaEncrpt
-from version import VERSION
+from JiaseLibrary.keywords._lambdasysauth import _LambdaSysAuthKeywords
+from JiaseLibrary.keywords._lambdasysorganize import _LambdaSysOrganizeKeywords
+from JiaseLibrary.keywords._lambdasysuser import _LambdaSysUserKeywords
+from JiaseLibrary.keywords._lambdacustomer import _LambdaCustomerKeywords
+from JiaseLibrary.keywords._lambdaloan import _LambdaLoanKeywords
+from JiaseLibrary.keywords._lambdacontract  import _LambdaContractKeywords
+from JiaseLibrary.keywords._lambdawithdrawal import _LambdaWithdrawalKeywords
+from JiaseLibrary.keywords._lambdarepayment import _LambdaRepaymentKeywords
+from JiaseLibrary.utils.lambda_db import LambdaDbCon
+from JiaseLibrary.utils.lambda_encrpt import LambdaEncrpt
+from JiaseLibrary.version import VERSION
 from faker.factory import Factory
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
