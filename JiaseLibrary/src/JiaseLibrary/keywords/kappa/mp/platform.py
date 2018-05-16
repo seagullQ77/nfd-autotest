@@ -3,22 +3,6 @@ from JiaseLibrary.utils.http import check_json_response
 
 class _PaltformKeywords():
 
-    def create_funds_account(self):
-        """
-        开通资金存管账户
-        :return:
-        """
-
-        ret = self.cust_platform_accout_getAccountList()
-        custId = ret['data'][0]['custId']
-        ret = self.cust_platform_accout_add_init(custId)
-        idCardNo = ret['data']['idCardNo']
-
-
-        aaa = 1
-
-
-
     def cust_platform_accout_add_init(self, custId):
         """
         绑卡初始化
@@ -36,6 +20,8 @@ class _PaltformKeywords():
     def cust_platform_accout_getAccountList(self):
         """
         存管账户列表页
+
+        获取所有相关用户的借款，担保账户信息
         :return:
         """
         url = "%s/cust/platform/accout/getAccountList" % self.interface_url
@@ -46,5 +32,16 @@ class _PaltformKeywords():
         ret = check_json_response(resp)
         return ret
 
-    def custInfo_platform_person_add(self):
-        pass
+    def custInfo_platform_person_add(self, realName, idCardNo, authList, custId):
+        url = "%s/custInfo/platform/person/add" % self.interface_url
+        load = {
+            "realName": realName,
+            "idCardNo": idCardNo,
+            "authList" : authList,
+            "custId" : custId,
+            "userRole": "BORROWERS",
+            "frontUrl" : None,
+        }
+        resp = self.session.post(url, json=load)
+        ret = check_json_response(resp)
+        return ret

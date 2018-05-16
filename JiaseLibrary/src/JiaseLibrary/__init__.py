@@ -16,6 +16,9 @@ from JiaseLibrary.utils.lambda_encrpt import LambdaEncrpt
 from JiaseLibrary.version import VERSION
 from faker.factory import Factory
 
+from JiaseLibrary.keywords.common.faker import FakerKeywords
+from JiaseLibrary.keywords.kappa.mp import KappaMpLibrary
+
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 CONF_PATH = BASE_DIR  + "\\JiaseLibrary\\config\\config.cfg"
 
