@@ -37,7 +37,7 @@ class _SysKeywords():
         url = "%s/logout" % self.interface_url
         load = {
         }
-        headers = self.session.headers
+        headers = self.session.headers.copy()
         headers['Content-Type'] = "application/x-www-form-urlencoded"
         resp = self.session.post(url, data = load, headers = headers)
         ret = check_json_response(resp)
@@ -48,7 +48,7 @@ class _SysKeywords():
         load = {
             "newPassword": newPassword,
         }
-        headers = self.session.headers
+        headers = self.session.headers.copy()
         headers['Content-Type'] = "application/x-www-form-urlencoded"
         resp = self.session.post(url, data = load, headers = headers)
         ret = check_json_response(resp)

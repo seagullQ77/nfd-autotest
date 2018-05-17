@@ -33,6 +33,14 @@ class _PaltformKeywords():
         return ret
 
     def custInfo_platform_person_add(self, realName, idCardNo, authList, custId):
+        """
+        个人借款账户绑卡
+        :param realName:
+        :param idCardNo:
+        :param authList:
+        :param custId:
+        :return:
+        """
         url = "%s/custInfo/platform/person/add" % self.interface_url
         load = {
             "realName": realName,
@@ -45,3 +53,4 @@ class _PaltformKeywords():
         resp = self.session.post(url, json=load)
         ret = check_json_response(resp)
         return ret
+
