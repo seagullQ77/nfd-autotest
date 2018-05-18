@@ -11,6 +11,7 @@ from JiaseLibrary.keywords._lambdaloan import _LambdaLoanKeywords
 from JiaseLibrary.keywords._lambdacontract  import _LambdaContractKeywords
 from JiaseLibrary.keywords._lambdawithdrawal import _LambdaWithdrawalKeywords
 from JiaseLibrary.keywords._lambdarepayment import _LambdaRepaymentKeywords
+from JiaseLibrary.keywords._lambdaproduct import _LambdaProductKeywords
 from JiaseLibrary.utils.lambda_db import LambdaDbCon
 from JiaseLibrary.utils.lambda_encrpt import LambdaEncrpt
 from JiaseLibrary.version import VERSION
@@ -32,23 +33,26 @@ class JiaseLibrary(
     _LambdaLoanKeywords,
     _LambdaContractKeywords,
     _LambdaWithdrawalKeywords,
-    _LambdaRepaymentKeywords
+    _LambdaRepaymentKeywords,
+    _LambdaProductKeywords
 ):
 
     ROBOT_LIBRARY_SCOPE = 'GLOBAL'
     ROBOT_LIBRARY_VERSION = VERSION
 
-    def __init__(self):
+    def __init__(self, lambda_host = None, lambda_port = None):
         self._init_request_arg()
         self._faker   = Factory.create(locale='zh_CN')
+        self.lambda_host = lambda_host
+        self.lambda_port = lambda_port
         self._get_config_lambda()
         self.db = LambdaDbCon(self._lambda_db_host,self._lambda_db_user,self._lambda_db_passwd,self._lambda_db_port,self._lambda_db_charset)
 
     def _get_config_lambda(self):
         cf = configparser.ConfigParser()
         cf.read(CONF_PATH,encoding='utf-8')
-        self._lambda_host                   = cf.get('lambda_web','lambda_host')
-        self._lambda_port                   = cf.get('lambda_web','lambda_port')
+        self._lambda_host                   = self.lambda_host or cf.get('lambda_web','lambda_host')
+        self._lambda_port                   = self.lambda_port or cf.get('lambda_web','lambda_port')
         self._lambda_url                    = 'http://%s:%s' %(self._lambda_host,self._lambda_port)
 
         self._lambda_db_host                = cf.get('lambda_db','lambda_db_host')
