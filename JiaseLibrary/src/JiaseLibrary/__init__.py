@@ -42,7 +42,19 @@ class JiaseLibrary(
 
     def __init__(self, lambda_host = None, lambda_port = None):
         self._init_request_arg()
+        from faker_nfd import NfdCompanyProvider
+        from faker_nfd import NfdCreditCardProvide
+        from faker_nfd import NfdDatatimeProvider
+        from faker_nfd import NfdLoremProvider
+        from faker_nfd import NfdPersonProvider
+        from faker_nfd import NfdAddressProvider
         self._faker   = Factory.create(locale='zh_CN')
+        self._faker.add_provider(NfdCompanyProvider)
+        self._faker.add_provider(NfdCreditCardProvide)
+        self._faker.add_provider(NfdDatatimeProvider)
+        self._faker.add_provider(NfdLoremProvider)
+        self._faker.add_provider(NfdPersonProvider)
+        self._faker.add_provider(NfdAddressProvider)
         self.lambda_host = lambda_host
         self.lambda_port = lambda_port
         self._get_config_lambda()
