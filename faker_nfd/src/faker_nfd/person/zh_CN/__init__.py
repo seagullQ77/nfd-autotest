@@ -586,7 +586,12 @@ class Provider(FakerProvider):
                  "郭温", "郎格丝", "苦行僧", "兰花", "林还恩"]
 
     def person_id(cls):
-        id = cls.random_element(cls.districtcode)
+        while True:
+            id = cls.random_element(cls.districtcode)
+            if id.endswith('00'):
+                continue
+            else:
+                break
         id = id + str(cls.random_int(1950, 1997))
         da = date.today() + timedelta(days=cls.random_int(1, 366))  # 月份和日期项
         id = id + da.strftime('%m%d')
