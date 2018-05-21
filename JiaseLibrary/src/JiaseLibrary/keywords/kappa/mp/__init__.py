@@ -87,7 +87,7 @@ class KappaMpLibrary(
         resp = self.session.post(parse.urljoin(resp.url,"/bha-neo-app/gateway/bankcard/bin"), data=load, headers = headers)
         assert resp.status_code == 200
         if json.loads(resp.text)['success'] != True:
-            raise AssertionError(json.loads(resp.text)['msg'])
+            raise AssertionError("%s, 卡号：%s" % (json.loads(resp.text)['msg'], bankcardNo))
         logger.info(json.dumps(json.loads(resp.text)))
 
         # 获取验证码

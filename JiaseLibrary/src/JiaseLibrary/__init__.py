@@ -12,6 +12,7 @@ from JiaseLibrary.keywords._lambdacontract  import _LambdaContractKeywords
 from JiaseLibrary.keywords._lambdawithdrawal import _LambdaWithdrawalKeywords
 from JiaseLibrary.keywords._lambdarepayment import _LambdaRepaymentKeywords
 from JiaseLibrary.keywords._lambdaproduct import _LambdaProductKeywords
+from JiaseLibrary.keywords._lambdatransfer import _LambdaTransferKeywords
 from JiaseLibrary.utils.lambda_db import LambdaDbCon
 from JiaseLibrary.utils.lambda_encrpt import LambdaEncrpt
 from JiaseLibrary.version import VERSION
@@ -34,7 +35,8 @@ class JiaseLibrary(
     _LambdaContractKeywords,
     _LambdaWithdrawalKeywords,
     _LambdaRepaymentKeywords,
-    _LambdaProductKeywords
+    _LambdaProductKeywords,
+    _LambdaTransferKeywords,
 ):
 
     ROBOT_LIBRARY_SCOPE = 'GLOBAL'
