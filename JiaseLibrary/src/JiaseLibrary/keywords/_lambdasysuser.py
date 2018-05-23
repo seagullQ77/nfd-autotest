@@ -190,7 +190,7 @@ class _LambdaSysUserKeywords():
             "creditCustName": cust['data']['baseInfo']['custName'],
             "creditIdCardNo": cust['data']['baseInfo']['idCode'],
             "creditMobilePhone": cust['data']['baseInfo']['mobilePhone'],
-            "custKind": "1",
+            "custKind": ["1", "2"],
             "idExpire": "",
             "country": "1",
             "nation": "1",
@@ -213,7 +213,7 @@ class _LambdaSysUserKeywords():
             "workDesc": "无",
             "baseInfo": {
                 "correlationRemark": "",                # 关联企业说明
-                "custKind": "1",                         # 客户类型,(字典：CUST_INFO_KIND。多选项:二进制存储,1-是,0-否,顺序如下：合作商|担保客户|贷款客户,如：111表示三者都是,011表示担保客户和贷款客户,100表示合作商) ,
+                "custKind": "1,2",                         # 客户类型,(字典：CUST_INFO_KIND。多选项:二进制存储,1-是,0-否,顺序如下：合作商|担保客户|贷款客户,如：111表示三者都是,011表示担保客户和贷款客户,100表示合作商) ,
                 "correlationRelationship": "false",   # 是否为关联关系 ,
                 "mobilePhone": cust['data']['baseInfo']['mobilePhone'],
                 "loginMobilePhone": cust['data']['baseInfo']['loginMobilePhone']

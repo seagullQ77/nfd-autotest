@@ -32,11 +32,17 @@ class _LambdaProductKeywords():
                 pid = p1id
                 name = name2
         else:
-            # 创建二级产品
+            # 创建三级产品
             if len(p2) == 0:
                 raise AssertionError("没有找到二级产品 %s" % name2)
             else:
                 p2 = p2[0]
+                p2id = p2['id']
+                p3 = [x for x in tree['data'] if x['name'] == name3 and x['pId'] == p2id]
+                if len(p3) > 0:
+                    logger.info("已经存在名为 %s 的产品了！" % name3)
+                    return False
+
                 pid = p2['id']
                 name = name3
         params = {

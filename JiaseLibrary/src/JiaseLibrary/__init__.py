@@ -42,7 +42,7 @@ class JiaseLibrary(
     ROBOT_LIBRARY_SCOPE = 'GLOBAL'
     ROBOT_LIBRARY_VERSION = VERSION
 
-    def __init__(self, lambda_host = None, lambda_port = None):
+    def __init__(self, lambda_host = None, lambda_port = None, lambda_db_host = None):
         self._init_request_arg()
         from faker_nfd import NfdCompanyProvider
         from faker_nfd import NfdCreditCardProvide
@@ -59,6 +59,7 @@ class JiaseLibrary(
         self._faker.add_provider(NfdAddressProvider)
         self.lambda_host = lambda_host
         self.lambda_port = lambda_port
+        self.lambda_db_host = lambda_db_host
         self._get_config_lambda()
         self.db = LambdaDbCon(self._lambda_db_host,self._lambda_db_user,self._lambda_db_passwd,self._lambda_db_port,self._lambda_db_charset)
 
@@ -69,7 +70,7 @@ class JiaseLibrary(
         self._lambda_port                   = self.lambda_port or cf.get('lambda_web','lambda_port')
         self._lambda_url                    = 'http://%s:%s' %(self._lambda_host,self._lambda_port)
 
-        self._lambda_db_host                = cf.get('lambda_db','lambda_db_host')
+        self._lambda_db_host                = self.lambda_db_host or cf.get('lambda_db','lambda_db_host')
         self._lambda_db_user                = cf.get('lambda_db','lambda_db_user')
         self._lambda_db_passwd              = cf.get('lambda_db','lambda_db_passwd')
         self._lambda_db_port                = cf.getint('lambda_db','lambda_db_port')
