@@ -6,6 +6,13 @@ from JiaseLibrary.version import VERSION
 from JiaseLibrary.keywords.kappa.mp.sys import _SysKeywords
 from JiaseLibrary.keywords.kappa.mp.platform import _PaltformKeywords
 
+from faker import Faker
+from faker_nfd import NfdCompanyProvider
+from faker_nfd import NfdCreditCardProvide
+from faker_nfd import NfdDatatimeProvider
+from faker_nfd import NfdLoremProvider
+from faker_nfd import NfdPersonProvider
+from faker_nfd import NfdAddressProvider
 from JiaseLibrary.utils.http import check_json_response
 
 __version__ = VERSION
@@ -41,29 +48,37 @@ class KappaMpLibrary(
         self.session = requests.session()
         self.session.headers["Content-Type"] = "application/json"
 
+        self.faker = Faker("zh_cn")
+        self.faker.add_provider(NfdCompanyProvider)
+        self.faker.add_provider(NfdCreditCardProvide)
+        self.faker.add_provider(NfdDatatimeProvider)
+        self.faker.add_provider(NfdLoremProvider)
+        self.faker.add_provider(NfdPersonProvider)
+        self.faker.add_provider(NfdAddressProvider)
+
     # High-Leverl的关键字先放这里吧，包里面放对应的后台的接口
 
-    def create_funds_account(self, bankcardNo, mobile, password = "123456"):
+    def create_funds_account(self, userRole = "BORROWERS", bankcardNo = None, mobile = None, password = "150315"):
         """
         开通资金存管账户
         :return:
         """
-
+        # GET http://kappa-mp-test.ronaldinho.svc.cluster.local/cust/platform/accout/add/init?_ukey=5381&r=0.2863182303018188&custId=31&userRole=GUARANTEECORP HTTP/1.1
         ret = self.cust_platform_accout_getAccountList()
         # 获取 custId
         custId = ret['data'][0]['custId']
         realName = ret['data'][0]['name']
-        ret = self.cust_platform_accout_add_init(custId)
+        ret = self.cust_platform_accout_add_init(custId, userRole=userRole)
 
         idCardNo = ret['data']['idCardNo']
         authList = [x['value'] for x in ret['data']['authList']]
-        ret = self.custInfo_platform_person_add(realName, idCardNo, authList, custId)
+        ret = self.custInfo_platform_person_add(realName, idCardNo, authList, custId, userRole=userRole)
         lanmaoly_param = ret['data']['data'].copy()
         del lanmaoly_param['reqDataObj']
         lanmaoly_url = ret['data']['url']
         j = json.loads(ret['data']['data']['reqData'])
         credType = j['idCardType']
-        userRole = j['userRole']
+        # userRole = j['userRole']
         requestNo = j['requestNo']
         platformUserNo = j['platformUserNo']
 
@@ -77,6 +92,11 @@ class KappaMpLibrary(
         query = parse.parse_qs(parse.urlparse(resp.url)[4])
         requestKey = query['requestKey'][0]
 
+        if bankcardNo == None:
+            bankcardNo = self.faker.credit_card_number()
+        if mobile == None:
+            mobile = self.faker.phone_number()
+
         # 检查银行卡
         load = {
             "bankcardNo": bankcardNo,
@@ -84,7 +104,8 @@ class KappaMpLibrary(
             "serviceType": "BANKCARD_AUTH",
         }
 
-        resp = self.session.post(parse.urljoin(resp.url,"/bha-neo-app/gateway/bankcard/bin"), data=load, headers = headers)
+        resp = self.session.post(parse.urljoin(resp.url, "/bha-neo-app/gateway/bankcard/bin"), data=load,
+                                 headers=headers)
         assert resp.status_code == 200
         if json.loads(resp.text)['success'] != True:
             raise AssertionError("%s, 卡号：%s" % (json.loads(resp.text)['msg'], bankcardNo))
@@ -96,7 +117,8 @@ class KappaMpLibrary(
             "mobile": mobile,
             "requestKey": requestKey,
         }
-        resp = self.session.post(parse.urljoin(resp.url, "/bha-neo-app/gateway/sms/smsForEnterprise"), data=load,headers=headers)
+        resp = self.session.post(parse.urljoin(resp.url, "/bha-neo-app/gateway/sms/smsForEnterprise"), data=load,
+                                 headers=headers)
         assert resp.status_code == 200
         assert json.loads(resp.text)['status'] == "SUCCESS"
         logger.info(json.loads(resp.text)['message'])
@@ -106,20 +128,31 @@ class KappaMpLibrary(
             "serviceType": "BANKCARD_AUTH",
             "realName": realName,
             "credType": credType,
-            "idCardNo" : idCardNo,
-            "maskedCredNum" : "" ,
-            "bankcardNo" : bankcardNo,
-            "mobile" : mobile,
-            "smsCode" : 150315,
-            "password" : password,
-            "confirmPassword" : password,
-            #"protocolCheckBox" : "false",
-            "requestKey" : requestKey,
+            "idCardNo": idCardNo,
+            "maskedCredNum": "",
+            "bankcardNo": bankcardNo,
+            "mobile": mobile,
+            "smsCode": 150315,
+            "password": password,
+            "confirmPassword": password,
+            # "protocolCheckBox" : "false",
+            "requestKey": requestKey,
 
         }
 
         headers_html = headers.copy()
         headers_html['Accept'] = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8"
-        resp = self.session.post(parse.urljoin(resp.url, "/bha-neo-app/gateway/mobile/personalRegisterExpand/register"), data=load, headers=headers_html)
+        resp = self.session.post(parse.urljoin(resp.url, "/bha-neo-app/gateway/mobile/personalRegisterExpand/register"),
+                                 data=load, headers=headers_html)
         assert resp.status_code == 200
         return ret
+
+
+
+
+
+
+
+
+
+
