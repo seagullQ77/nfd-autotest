@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # AES/CBC/pkcs5padding， 128位 ，密钥KLambdaDaiFaNong ，偏移量0102030405060708 
-from Cryptodome.Cipher import AES
+from Crypto.Cipher import AES
 import base64
 
 '''

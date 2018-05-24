@@ -1,9 +1,11 @@
  # -*- coding:utf-8 -*-
 import json
 import hashlib
+from random import choice
 from robot.api import logger
 from warnings import catch_warnings
-from utils.lambda_db import LambdaDbCon
+from JiaseLibrary.utils.lambda_db import LambdaDbCon
+from JiaseLibrary.utils.http import check_json_response
 
 
 class _LambdaSysUserKeywords():
@@ -123,5 +125,132 @@ class _LambdaSysUserKeywords():
             raise AssertionError(u'新增用户明细失败:%s' %account)
                     
     
+    def cust_infos_queryByName(self, name):
+        """
+        获取客户信息
+        :param name:
+        :return:
+        GET /cust/infos/queryByName
+        """
+        params = {
+            "name": name,
+        }
+        url = '%s/cust/infos/queryByName' % self._lambda_url
+        res = self._request.get(url, params=params)
+        ret = check_json_response(res)
+        if len(ret['data']) == 0:
+            raise AssertionError("没有找到名为 %s 的管户经理 ！" % name)
+        elif len(ret['data']) > 1:
+            logger.warn("%s 对应不止一个管户经理，暂时只选择第一个！")
+        c = ret['data'][0]
+        return c
+
+    def cust_infos_id_personal_view(self, custId, applyCode = None):
+        """
+        GET /cust/infos/personal/view   个人信息-详情
+        :return:
+
+        "http://lambda-web-test.ronaldinho.svc.cluster.local/cust/infos/personal/view?_ukey=5381&r=0.6827423719274031&custId=29&applyCode="
+        """
+        params = {
+            "custId": custId,
+            "applyCode":applyCode,
+        }
+        url = '%s/cust/infos/personal/view' % self._lambda_url
+        res = self._request.get(url, params=params)
+        ret = check_json_response(res)
+        return ret
 
 
+    def set_personal_common_info(self, id, education = None, familyAddress = None):
+        """
+        设置基本信息
+        POST http://lambda-web-test.ronaldinho.svc.cluster.local/cust/infos/personal/update HTTP/1.1
+        :return:
+        """
+        cust = self.cust_infos_id_personal_view(id)
+
+        if cust['data']['education'] == '':
+            education = choice(["ZJ", "ZK", "BK", "YJS", "CZ"])
+        else:
+            education = cust['data']['education']
+
+        if cust['data']['familyAddress'] == '':
+            familyAddress = self._faker.street_address()
+        else:
+            familyAddress = cust['data']['familyAddress']
+        params = {
+            "id": id,
+            "education": education,
+            "familyAddress": familyAddress,
+            "custEdit": "true",
+            "customerType": "NORMAL",   # 客户业务类型：NORMAL正常 , RICH富农贷客户 ,
+            "creditCustType": "GR",
+            "creditCustId": id,
+            "creditCustName": cust['data']['baseInfo']['custName'],
+            "creditIdCardNo": cust['data']['baseInfo']['idCode'],
+            "creditMobilePhone": cust['data']['baseInfo']['mobilePhone'],
+            "custKind": ["1", "2"],
+            "idExpire": "",
+            "country": "1",
+            "nation": "1",
+            "familyProvinceId": cust['data']['familyProvinceId'],
+            "familyCityId": cust['data']['familyCityId'],
+            "familyCountyId": cust['data']['familyCountyId'],
+            "healthCondition": "ZC",
+            "maritalCondition": "1",
+            "isLimitless": "",
+            "addressType": "20",
+            "residenceCondition": "70",
+            "residenceProvinceId": cust['data']['residenceProvinceId'],
+            "residenceCityId": cust['data']['residenceCityId'],
+            "residenceCountyId": cust['data']['residenceCountyId'],
+            "residencePhone": "",
+            "residenceAddress": cust['data']['residenceAddress'],
+            "familyCount": "1",
+            "familyDesc": "无",
+            "workYear": "1",
+            "workDesc": "无",
+            "baseInfo": {
+                "correlationRemark": "",                # 关联企业说明
+                "custKind": "1,2",                         # 客户类型,(字典：CUST_INFO_KIND。多选项:二进制存储,1-是,0-否,顺序如下：合作商|担保客户|贷款客户,如：111表示三者都是,011表示担保客户和贷款客户,100表示合作商) ,
+                "correlationRelationship": "false",   # 是否为关联关系 ,
+                "mobilePhone": cust['data']['baseInfo']['mobilePhone'],
+                "loginMobilePhone": cust['data']['baseInfo']['loginMobilePhone']
+            }
+        }
+        url = '%s/cust/infos/personal/update' % self._lambda_url
+        res = self._request.post(url, json = params)
+        ret = check_json_response(res)
+
+
+    def create_plant_business(self, custId, plantYear = 5, isMain = True):
+        """
+        新增种植业务
+        :param plantYear:
+        :return:
+
+        POST http://lambda-web-test.ronaldinho.svc.cluster.local/cust/business/new/create HTTP/1.1
+        """
+        params = {
+            "custId":custId,
+            "businessType": "ZZ",
+            "plantYear": plantYear,
+            "isMain": isMain,
+
+        }
+        url = '%s/cust/business/new/create' % self._lambda_url
+        res = self._request.post(url, json = params)
+        ret = check_json_response(res)
+
+    def complete_user_info(self, name):
+        cust = self.cust_infos_queryByName(name)
+        cust_id = cust['id']
+
+        # 增加一个经营的业务
+        self.create_plant_business(cust_id)
+
+        # 完善基本信息
+        self.set_personal_common_info(cust_id)
+
+        aaa = 1

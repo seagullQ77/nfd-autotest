@@ -4,7 +4,7 @@ import random
 import datetime
 from functools import reduce
 from robot.api import logger
-from utils.lambda_encrpt import LambdaEncrpt
+from JiaseLibrary.utils.lambda_encrpt import LambdaEncrpt
 
 class _LambdaCustomerKeywords():
     
