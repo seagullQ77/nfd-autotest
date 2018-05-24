@@ -24,8 +24,8 @@ class LambdaEncrpt():
         self.mode = AES.MODE_CBC
         
     def _encrypt(self,source):       
-        BS = 16
-        pad_it = lambda s: s + (16 - len(s.encode('utf-8')) % 16) *'\0' if len(s.encode('utf-8'))%16 !=0 else s
+        slen = len(source.encode('utf-8'))%16
+        pad_it = lambda s: s + (16-slen) *chr(16-slen)
         generator = AES.new(self.key, self.mode, self.iv)
         crypt = generator.encrypt(pad_it(source).encode())
         cryptedStr = base64.b64encode(crypt)
@@ -33,11 +33,13 @@ class LambdaEncrpt():
     def _decrypt(self,text):
         generator = AES.new(self.key, self.mode, self.iv)
         recovery = generator.decrypt(base64.b64decode(text))
-        decryStr = (recovery.decode()).rstrip('\0')
+        unpad = lambda s : s[0:-ord(s[-1])]
+        decryStr =unpad ((recovery.decode()))
         return decryStr
 
 
 if __name__ == '__main__':
     pc = LambdaEncrpt('lambda_test')
-    print(pc._encrypt('测试1231231c12'))
-    print(pc._decrypt('5pkA+WBlUkYQ5Uvd5JB5DQ=='))
+    print(pc._encrypt('GreenPolls测试'))
+    print(pc._decrypt('VjlVB1WhVQZOMxXIF+I+TGK4VzqamhonfjsALU4MKNw='))
+    #VjlVB1WhVQZOMxXIF+I+TGK4VzqamhonfjsALU4MKNw=
