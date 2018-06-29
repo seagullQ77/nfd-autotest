@@ -70,7 +70,17 @@ class JiaseLibrary(
         self._lambda_port                   = self.lambda_port or cf.get('lambda_web','lambda_port')
         self._lambda_url                    = 'http://%s:%s' %(self._lambda_host,self._lambda_port)
 
+
         self._lambda_db_host                = self.lambda_db_host or cf.get('lambda_db','lambda_db_host')
+
+        self._lambda_server_port = cf.get('lambda_web', 'lambda_server_port')
+        self._lambda_server_url = 'http://%s:%s' % (self._lambda_host, self._lambda_server_port)
+
+        self._delta_port = cf.get('lambda_web', 'delta_port')
+        self._delta_url = 'http://%s:%s' % (self._lambda_host, self._delta_port)
+
+        self._lambda_db_host                = cf.get('lambda_db','lambda_db_host')
+
         self._lambda_db_user                = cf.get('lambda_db','lambda_db_user')
         self._lambda_db_passwd              = cf.get('lambda_db','lambda_db_passwd')
         self._lambda_db_port                = cf.getint('lambda_db','lambda_db_port')
@@ -82,13 +92,14 @@ class JiaseLibrary(
         self._lambda_invest_manager         = cf.get('lambda_roles','lambda_invest_manager')        
         self._lambda_invest_major           = cf.get('lambda_roles','lambda_invest_major')
         self._lambda_invest_develop         = cf.get('lambda_roles', 'lambda_invest_develop')
+        self._lambda_file_transfer          = cf.get('lambda_roles', 'lambda_file_transfer')
         self._lambda_inner_audit            = cf.get('lambda_roles','lambda_inner_audit')           
         self._lambda_audit_1                = cf.get('lambda_roles','lambda_audit_1')               
         self._lambda_audit_2                = cf.get('lambda_roles','lambda_audit_2')               
         self._lambda_audit_3                = cf.get('lambda_roles','lambda_audit_3')               
         self._lambda_financial_review_audit = cf.get('lambda_roles','lambda_financial_review_audit')
         self._lambda_loans_a                = cf.get('lambda_roles','lambda_loans_a')               
-        self._lambda_loans_b                = cf.get('lambda_roles','lambda_loans_b')               
+        self._lambda_loans_b                = cf.get('lambda_roles','lambda_loans_b')
         #self._lambda_finance_director       = cf.get('lambda_roles','lambda_finance_director')
         self._lambda_repay_match            = cf.get('lambda_roles','lambda_repay_match')           
         self._lambda_meeting_audit          = cf.get('lambda_roles','lambda_meeting_audit')
@@ -109,8 +120,17 @@ if __name__ == '__main__':
 
     jiase = JiaseLibrary()
     jiase.login_lambda(role='lambda_invest_manager')
+    #jiase.loan_apply_pass_workflow(loan_apply_id= 7, loan_amount=1000)
+    # cust_personal_id1 = jiase.custom_personal_create(cust_name='test1个人')
+    # cust_personal_id2 = jiase.custom_personal_create(cust_name='test2个人')
+    cust_personal_id = jiase.custom_personal_create(cust_name='委托geren1')
+    cust_enterprise_id = jiase.custom_enterprise_create(cust_personal_id, cust_name='委托qiye11')
+    '''
 
-    cust_personal_id1 = jiase.custom_personal_create(cust_name='test11个人')
+    jiase.login_lambda(role='lambda_invest_manager')
+
+    cust_personal_id = jiase.custom_personal_create(cust_name='莫新金')
+    
     cust_personal_id2 = jiase.custom_personal_create(cust_name='test12个人')
     cust_personal_id3 = jiase.custom_personal_create(cust_name='test13个人')
     cust_personal_id4 = jiase.custom_personal_create(cust_name='test14个人')
@@ -134,20 +154,23 @@ if __name__ == '__main__':
 
     cust_personal_id = jiase.custom_personal_create(cust_name='test10个人')
     cust_enterprise_id = jiase.custom_enterprise_create(cust_personal_id,cust_name='test10企业')
-
+  '''
+    '''
     # 生成授信
-    loan_apply_id = jiase.loan_apply_create(cust_personal_id)
+    loan_apply_id = jiase.loan_apply_create(cust_personal_id2)
 
     # 生成授信明细
     loan_detail_id1 = jiase.loan_apply_prepare_create(loan_apply_id)
-    jiase.loan_detail_self_save(loan_apply_id, loan_detail_id1,'yjtest_种植贷',self_limit='100000')
-    jiase.loan_detail_guarantor_save(loan_apply_id, loan_detail_id1,'yjtest_种植贷',guarantee_limit='50000')
+    jiase.loan_detail_self_save(loan_apply_id, loan_detail_id1,'种植贷',self_limit='1000000')
+    jiase.loan_detail_guarantor_save(loan_apply_id, loan_detail_id1,'种植贷',guarantee_limit='50000')
+
     # 添加担保方
-    jiase.loan_guarantors_create(loan_detail_id1, cust_enterprise_id)
+    jiase.loan_guarantors_create(loan_detail_id1, cust_personal_id1)
 
     # 投资经理提交授信申请
     jiase.loan_apply_submit(loan_apply_id)
-
+    '''
+    '''
     # 投资总监处理
     jiase.login_lambda(role='lambda_invest_major')
     jiase.loan_apply_pass(loan_apply_id,is_claim='Y')
@@ -171,6 +194,8 @@ if __name__ == '__main__':
     # 投资经理提交授信申请
     jiase.login_lambda(role='lambda_invest_manager')
     jiase.loan_apply_submit(loan_apply_id,is_next='Y')
+    
+    '''
 
 
 

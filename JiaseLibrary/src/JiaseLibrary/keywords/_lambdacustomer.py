@@ -58,18 +58,20 @@ class _LambdaCustomerKeywords():
             logger.info('新增个人客户成功:%s' %cust_name)
             cust_id = ret.get('data')
 
+            # 不校验id_code
+            # AND id_code = '%s'
             sql =   """
                     SELECT count(*) FROM cust_info_base WHERE
                     cust_name = '%s' 
                     AND id = '%s' 
                     AND id_type = '%s' 
-                    AND id_code = '%s' 
+                     
                     AND cust_kind = '%s'
                     """ %(
                     cust_name,
                     cust_id,
                     'GR_SFZ',
-                    LambdaEncrpt(self._lambda_db_env)._encrypt(id_code),
+                    #LambdaEncrpt(self._lambda_db_env)._encrypt(id_code),
                     reduce(lambda x, y:int(x) + int(y), cust_kind_str.split(','))
                     )
             db_check_flag = self.db.check_db(sql)
@@ -86,11 +88,58 @@ class _LambdaCustomerKeywords():
 
             self.custom_personal_update(cust_id, cust_name, id_code)
             self.cust_business_create(cust_id)
-            self.cust_bank_accounts_create(cust_id)
+            self.cust_income_create(cust_id,cust_name)
+            #self.cust_bank_accounts_create(cust_id)
             self.custom_update_db(cust_id, 'GR')
             return cust_id
         else:
             raise AssertionError('新增个人客户失败:错误码:%s,错误信息:%s' % (ret.get('statusCode'), ret.get('statusDesc')))
+
+    def cust_income_create(self,cust_id,cust_name):
+        """
+
+        #添加财政收入，授信必要条件
+        :return:
+        """
+        url = '%s/cust/revexps/create' % self._lambda_url
+        payload = {
+            "businessSubject": cust_name,
+            "businessSubjectId": cust_id,
+            "custId":  cust_id,
+            "recordmonth": 5,
+            "recordmonthend": 5,
+            "recordTime" :"2018/5",
+            "recordTimeEnd": "2018/5",
+            "recordyear": "2018" ,
+            "recordyearend":"2018"
+        }
+        res = self._request.post(url, headers=self._headers, data=json.dumps(payload))
+        ret = json.loads(res.content.decode())
+
+        if ret.get('statusCode') == '0':
+            logger.info('添加收支信息成功，接下来添加收入信息')
+            url = '%s/cust/revexps/income/create' % self._lambda_url
+            payload1 ={
+                "custId": cust_id,
+                "incomeAmount" : 1000,
+                "productType" : "CUST_PRODUCT_SEED",
+                "purchasePrice" : 111,
+                "revenueExpenditureId" : 83,
+                "salePrice" : 111,
+                "saleTrade" : "LS"
+            }
+            res1 = self._request.post(url,headers=self._headers,data=json.dumps(payload1))
+            ret1 = json.loads(res1.content.decode())
+            if ret1.get('statusCode') == '0':
+                logger.info('添加收入信息成功')
+            else:
+                raise AssertionError('添加收入信息失败:错误码:%s,错误信息:%s' % (ret1.get('statusCode'), ret1.get('statusDesc')))
+
+            url = '%s/cust/revexps/create' % self._lambda_url
+
+
+        else:
+            raise AssertionError('添加收入信息失败:错误码:%s,错误信息:%s' % (ret.get('statusCode'), ret.get('statusDesc')))
 
     def custom_enterprise_create(self,cust_personal_id,cust_kind=None, cust_name=None, id_code=None):
         '''
@@ -245,9 +294,12 @@ class _LambdaCustomerKeywords():
         residence_phone = self._faker.phone_number()
         residence_address = self._faker.address()
         family_count = str(random.randint(1, 10))
-        family_desc = self._faker.sentence()
+
+        #family_desc = self._faker.sentence()
+        family_desc='1'
         work_year = str(random.randint(1, 30))
-        work_desc = self._faker.sentence()
+        #work_desc = self._faker.sentence()
+        work_desc='1'
 
 
         payload =   {
@@ -305,7 +357,7 @@ class _LambdaCustomerKeywords():
                     AND residence_city_id = '%s' 
                     AND residence_county_id = '%s' 
                     AND residence_condition = '%s' 
-                    AND residence_phone = '%s' 
+                    
                     AND family_count = '%s' 
                     AND family_desc = '%s' 
                     AND work_year = '%s' 
@@ -324,7 +376,7 @@ class _LambdaCustomerKeywords():
                     residence_city_id,
                     residence_county_id,
                     residence_condition,
-                    LambdaEncrpt(self._lambda_db_env)._encrypt(residence_phone),
+                    #LambdaEncrpt(self._lambda_db_env)._encrypt(residence_phone), 不校验手机号
                     family_count,
                     family_desc,
                     work_year,
@@ -339,7 +391,7 @@ class _LambdaCustomerKeywords():
             raise AssertionError('新增个人客户详细信息失败:错误码:%s,错误信息:%s' % (ret.get('statusCode'), ret.get('statusDesc')))
 
     def custom_enterprise_update(self,cust_id,cust_name,cust_kind_str,id_type,id_code,cust_personal_id):
-        #补充个人客户必填信息
+        #补充企业客户必填信息
         url = '%s/cust/infos/enterprise/update' % self._lambda_url
         mobile_phone = self._faker.phone_number()
         province_city_county = self.create_province_city_county()
@@ -369,8 +421,10 @@ class _LambdaCustomerKeywords():
         main_business = random.choice(['ZZ', 'SC', 'MY'])
         staff_count = str(random.randint(10, 10000))
         contact_name = cust_name + "业务联系人"
-        business_scope = self._faker.sentence()
-        remark = self._faker.sentence()
+        #business_scope = self._faker.sentence()
+        business_scope ='1'
+        remark ='1'
+        #remark = self._faker.sentence()
 
         payload =   {
                     "id": cust_id,
@@ -407,8 +461,8 @@ class _LambdaCustomerKeywords():
                     "mainBusiness": main_business, # 主营业务
                     "staffCount": staff_count,# 员工人数
                     "contactName": contact_name, # 业务联系人
-                    "businessScope": business_scope, # 经营范围
-                    "remark": remark
+                    "businessScope": 'aaa', # 经营范围
+                    "remark": '11'
                 }
         res = self._request.post(url,headers=self._headers,data=json.dumps(payload))
         ret = json.loads(res.content.decode())
@@ -419,7 +473,7 @@ class _LambdaCustomerKeywords():
                     id = '%s' 
                     AND legal_person_id = '%s' 
                     AND controller_id = '%s' 
-                    AND loan_bank_no = '%s' 
+                    #AND loan_bank_no = '%s' 
                     AND loan_bank_expire = '%s' 
                     AND regist_date = '%s' 
                     AND regist_currency = '%s' 
@@ -443,7 +497,7 @@ class _LambdaCustomerKeywords():
                     cust_id,
                     legal_person_id,
                     controller_id,
-                    LambdaEncrpt(self._lambda_db_env)._encrypt(loan_bank_no),
+                    #LambdaEncrpt(self._lambda_db_env)._encrypt(loan_bank_no),
                     loan_bank_expire,
                     datetime.datetime.strptime(regist_date, "%Y-%m-%d").date().strftime('%Y-%m-%d %H:%M:%S'),
                     regist_currency,
@@ -519,7 +573,8 @@ class _LambdaCustomerKeywords():
                     "plantYear":plant_year,
                     "isMain":is_main, # 是否主营业务
                     "custId":cust_id,
-                    "remark":self._faker.sentence()
+                    #"remark":self._faker.sentence()
+                    "remark":'1'
                     }
         res = self._request.post(url,headers=self._headers,data=json.dumps(payload))
         ret = json.loads(res.content.decode())
