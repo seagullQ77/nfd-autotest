@@ -291,6 +291,8 @@ class _LambdaLoanKeywords():
         else:
             raise AssertionError('获取客户银行账号列表失败,错误码:%s,错误信息: %s' % (ret.get('statusCode'), ret.get('statusDesc')))
 
+    """
+    #不是必填，对业务暂时不影响
     def query_agreement_list(self,loan_detail_id):
         '''
         获取账户约定信息
@@ -364,7 +366,7 @@ class _LambdaLoanKeywords():
                     raise AssertionError('更新账户约定数据库验证失败 sql:%s' % sql)
             else:
                 raise AssertionError('更新账户约定失败,错误码:%s,错误信息:%s' % (ret.get('statusCode'), ret.get('statusDesc')))
-
+"""
     def loan_detail_self_temp_save(self,cust_id, prod_credit_id,prod_id,loan_apply_id, loan_detail_id,borrower_ratio,interest_subsidy_ratio,withhold):
         '''
         自贷额度暂存新增账户约定
@@ -436,11 +438,12 @@ class _LambdaLoanKeywords():
             loan_duration = str(random.randint(loan_duration_min*28,loan_duration_max*28))
         loan_duration = kwargs.get('loan_duration',loan_duration)
 
-        self_limit = kwargs.get('self_limit', str(random.randint(5,5000)*1000)) #自带额度
+        self_limit = kwargs.get('self_limit', str(random.randint(5,5000)*10000)) #自带额度
         limit_type = kwargs.get('limit_type', random.choice(['GENERAL','SPECIAL'])) # 额度类型
         single_withdrawal_period = str(random.randint(1,10)) # 单笔提款最长期限
         limit_duration = str(random.randint(1,10)) # 额度存续期限
-        borrower_ratio = str(round(random.uniform(1,10),1))  # 借款人质保金比例
+        borrower_ratio = 0 #没有保证金
+        #borrower_ratio = str(round(random.uniform(1,10),1))  # 借款人质保金比例
         init_interest_subsidy = "N" # 无用
 
         interest_subsidy_area = prod_credit_config.get('alllowDiscount').split(',')
@@ -540,7 +543,7 @@ class _LambdaLoanKeywords():
             fund_source_type = fund_source_dict.get('categoryCode')
 
         self.loan_detail_self_temp_save(cust_id, prod_credit_id,prod_id,loan_apply_id, loan_detail_id,borrower_ratio,interest_subsidy_ratio,withhold)
-        self.update_agreement(loan_apply_id, loan_detail_id)
+        #self.update_agreement(loan_apply_id, loan_detail_id)
 
         url = '%s/loan/credit/details/self/save' % self._lambda_url
         data = {
@@ -1362,7 +1365,7 @@ class _LambdaLoanKeywords():
             loan_apply_info = self.loan_apply_view(loan_apply_id)
             cust_id = loan_apply_info.get('custId')
             cust_type = loan_apply_info.get('custType')
-            self.update_agreement(loan_apply_id, loan_detail_id)
+            #self.update_agreement(loan_apply_id, loan_detail_id)
             sql =   """
                     SELECT
                       COUNT(*)
@@ -1441,3 +1444,36 @@ class _LambdaLoanKeywords():
                 raise AssertionError('授信担保方列表中找不到对应的担保方')
         else:
             raise AssertionError('查询担保方列表失败,错误码:%s,错误信息:%s' % (ret.get('statusCode'), ret.get('statusDesc')))
+
+
+
+
+
+
+    def loan_apply_pass_workflow(self,loan_apply_id,loan_amount):
+
+        '''
+            # 授信审批流程
+            :param loan_apply_id:授信id
+        '''
+        # # 投资总监审批
+        # self.login_lambda(role='lambda_invest_major')
+        # self.loan_apply_pass(self, loan_apply_id, is_next='Y', is_claim=None, candidate_group=None)
+        #
+        # # 档案收发岗
+        # self.login_lambda(role='lambda_file_transfer')
+        # self.loan_apply_pass(self, loan_apply_id, is_next='Y', is_claim=None, candidate_group=None)
+
+        # 内审岗
+        self.login_lambda(role='lambda_inner_audit')
+        self.loan_apply_pass(self, loan_apply_id, is_next='Y', is_claim=None, candidate_group = ['一级审批岗'])
+
+        # 一级审批岗
+        self.login_lambda(role='lambda_audit_1')
+        self.loan_apply_pass(self, loan_apply_id, is_next='Y', is_claim=None, candidate_group=None)
+
+        if loan_amount>=1000000:
+        # 贷审会秘书
+            self.login_lambda(role='lambda_meeting_audit')
+            self.loan_apply_pass(self, loan_apply_id, is_next='Y', is_claim=None, candidate_group=None)
+

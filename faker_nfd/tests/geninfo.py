@@ -1,3 +1,5 @@
+
+
 from faker import Faker
 
 from faker_nfd import NfdCompanyProvider
@@ -35,4 +37,3 @@ print(fake.organization_code())
 print(fake.nfd_province())
 print(fake.nfd_cityId())
 
-aaa = 1
