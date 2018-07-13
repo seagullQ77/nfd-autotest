@@ -95,13 +95,14 @@ class _LambdaCustomerKeywords():
         else:
             raise AssertionError('新增个人客户失败:错误码:%s,错误信息:%s' % (ret.get('statusCode'), ret.get('statusDesc')))
 
+
     def cust_income_create(self,cust_id,cust_name):
         """
 
         #添加财政收入，授信必要条件
         :return:
         """
-        url = '%s/cust/revexps/create' % self._lambda_url
+        url1 = '%s/cust/revexps/create' % self._lambda_url
         payload = {
             "businessSubject": cust_name,
             "businessSubjectId": cust_id,
@@ -113,33 +114,37 @@ class _LambdaCustomerKeywords():
             "recordyear": "2018" ,
             "recordyearend":"2018"
         }
-        res = self._request.post(url, headers=self._headers, data=json.dumps(payload))
-        ret = json.loads(res.content.decode())
+        res1 = self._request.post(url1, headers=self._headers, data=json.dumps(payload))
+        ret1 = json.loads(res1.content.decode())
 
-        if ret.get('statusCode') == '0':
+        url2 = '%s/cust/revexps/list' % self._lambda_url
+        params = {"custId": cust_id}
+        res2 = self._request.get(url2, headers=self._headers, params = params)
+        ret2 = json.loads(res2.content.decode())
+        revenueExpenditure_list = ret2.get('data')
+        for revenueExpenditure in revenueExpenditure_list:
+            revenueExpenditure_id = revenueExpenditure.get('id')
+
+        if ret1.get('statusCode') == '0':
             logger.info('添加收支信息成功，接下来添加收入信息')
-            url = '%s/cust/revexps/income/create' % self._lambda_url
+            url3 = '%s/cust/revexps/income/create' % self._lambda_url
             payload1 ={
                 "custId": cust_id,
                 "incomeAmount" : 1000,
                 "productType" : "CUST_PRODUCT_SEED",
                 "purchasePrice" : 111,
-                "revenueExpenditureId" : 83,
+                "revenueExpenditureId" : revenueExpenditure_id,
                 "salePrice" : 111,
                 "saleTrade" : "LS"
             }
-            res1 = self._request.post(url,headers=self._headers,data=json.dumps(payload1))
-            ret1 = json.loads(res1.content.decode())
-            if ret1.get('statusCode') == '0':
-                logger.info('添加收入信息成功')
+            res3 = self._request.post(url3,headers=self._headers,data=json.dumps(payload1))
+            ret3 = json.loads(res3.content.decode())
+            if ret3.get('statusCode') == '0':
+                logger.info('添加总收入成功')
             else:
-                raise AssertionError('添加收入信息失败:错误码:%s,错误信息:%s' % (ret1.get('statusCode'), ret1.get('statusDesc')))
-
-            url = '%s/cust/revexps/create' % self._lambda_url
-
-
+                raise AssertionError('添加总收入失败:错误码:%s,错误信息:%s' % (ret3.get('statusCode'), ret3.get('statusDesc')))
         else:
-            raise AssertionError('添加收入信息失败:错误码:%s,错误信息:%s' % (ret.get('statusCode'), ret.get('statusDesc')))
+            raise AssertionError('添加收入信息失败:错误码:%s,错误信息:%s' % (ret1.get('statusCode'), ret1.get('statusDesc')))
 
     def custom_enterprise_create(self,cust_personal_id,cust_kind=None, cust_name=None, id_code=None):
         '''
@@ -422,8 +427,8 @@ class _LambdaCustomerKeywords():
         staff_count = str(random.randint(10, 10000))
         contact_name = cust_name + "业务联系人"
         #business_scope = self._faker.sentence()
-        business_scope ='1'
-        remark ='1'
+        business_scope ='aaa'
+        remark ='ss'
         #remark = self._faker.sentence()
 
         payload =   {
@@ -462,8 +467,8 @@ class _LambdaCustomerKeywords():
                     "staffCount": staff_count,# 员工人数
                     "contactName": contact_name, # 业务联系人
                     "businessScope": 'aaa', # 经营范围
-                    "remark": '11'
-                }
+                    "remark": 'ss'
+                }   ##AND loan_bank_no = '%s'   #LambdaEncrpt(self._lambda_db_env)._encrypt(loan_bank_no),
         res = self._request.post(url,headers=self._headers,data=json.dumps(payload))
         ret = json.loads(res.content.decode())
         if ret.get('statusCode') == '0':
@@ -473,7 +478,6 @@ class _LambdaCustomerKeywords():
                     id = '%s' 
                     AND legal_person_id = '%s' 
                     AND controller_id = '%s' 
-                    #AND loan_bank_no = '%s' 
                     AND loan_bank_expire = '%s' 
                     AND regist_date = '%s' 
                     AND regist_currency = '%s' 
@@ -497,7 +501,6 @@ class _LambdaCustomerKeywords():
                     cust_id,
                     legal_person_id,
                     controller_id,
-                    #LambdaEncrpt(self._lambda_db_env)._encrypt(loan_bank_no),
                     loan_bank_expire,
                     datetime.datetime.strptime(regist_date, "%Y-%m-%d").date().strftime('%Y-%m-%d %H:%M:%S'),
                     regist_currency,

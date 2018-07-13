@@ -149,7 +149,7 @@ class _LambdaLoanKeywords():
 
         for mgnt_fees in mgnt_fees_list:
             mgnt_fees_id = mgnt_fees.get('id')
-            mgnt_fees_value = str(round(random.uniform(1,10),1))
+            mgnt_fees_value = str(round(random.uniform(1,5),1))
             mgnt_fees_calc_type = random.choice(['NHLL','GDBL','GDZ'])
             mgnt_fees_item_id = mgnt_fees.get('itemId')
             mgnt_fees_item_name = mgnt_fees.get('itemName')
@@ -184,7 +184,8 @@ class _LambdaLoanKeywords():
         service_fees_list = effectived_credit_config.get('serviceFees')
         for service_fees in service_fees_list:
             service_fees_id = service_fees.get('id')
-            service_fees_value = str(round(random.uniform(1,10),1))
+            service_fees_value = '0'
+            #service_fees_value = str(round(random.uniform(1,10),1))
             service_fees_calc_type = random.choice(['NHLL','GDBL','GDZ'])
             service_fees_item_id = service_fees.get('itemId')
             service_fees_item_name = service_fees.get('itemName')
@@ -440,7 +441,8 @@ class _LambdaLoanKeywords():
 
         self_limit = kwargs.get('self_limit', str(random.randint(5,5000)*10000)) #自带额度
         limit_type = kwargs.get('limit_type', random.choice(['GENERAL','SPECIAL'])) # 额度类型
-        single_withdrawal_period = str(random.randint(1,10)) # 单笔提款最长期限
+        #single_withdrawal_period = str(random.randint(1,10)) # 单笔提款最长期限
+        single_withdrawal_period = '12'
         limit_duration = str(random.randint(1,10)) # 额度存续期限
         borrower_ratio = 0 #没有保证金
         #borrower_ratio = str(round(random.uniform(1,10),1))  # 借款人质保金比例
@@ -681,7 +683,7 @@ class _LambdaLoanKeywords():
         single_longest_limit_duration_unit = random.choice(["MONTH",'DAY'])
         loan_comprehensive_year_rate = str(random.randint(0,10))
         loan_comprehensive_year_rate_up = str(random.randint(0,10) + 30)
-        loan_year_rate_guarantor =  str(random.randint(1,20)) #借款年化利率
+        loan_year_rate_guarantor =  str(random.randint(10,20)) #借款年化利率
         guarantee_ratio = str(round(random.uniform(1,10),1))
         config_borrow_year_rate = str(round(random.uniform(1,10),1))
         borrow_year_rate = str(round(random.uniform(1,10),1)) # 借款主体承担年利率
@@ -1330,8 +1332,9 @@ class _LambdaLoanKeywords():
         interest_subsidy = loan_detail_self_info.get('interestSubsidy')
 
 
-        guarantor_ratio =  str(random.randint(0,100))
-        deposit_ratio = str(random.randint(0,100))
+        #guarantor_ratio =  str(random.randint(0,100))
+        guarantor_ratio = 0
+        deposit_ratio = 0
 
         if interest_subsidy == 'Y':
             interest_subsidy_ratio = str(round(random.uniform(1, 10), 1))
@@ -1339,7 +1342,7 @@ class _LambdaLoanKeywords():
             interest_subsidy_ratio = '0'
 
         is_deductible_limit = kwargs.get('is_deductible_limit','false')
-        is_main_guarantor = kwargs.get('is_main_guarantor','false')
+        is_main_guarantor = kwargs.get('is_main_guarantor','true')
         is_provide_guarantee = kwargs.get('is_provide_guarantee','false')
         url = '%s/loan/guarantors/create' % self._lambda_url
         payload =   {
