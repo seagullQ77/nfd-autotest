@@ -24,7 +24,7 @@ def getLinks(articleUrl):
     return bsObj.find('div',)
 
 links = getLinks('')
-
+    
 try:
     while len(links)>0:
         newArticle = links[random.randint(0,len(links))]
