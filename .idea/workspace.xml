@@ -1,34 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="371c39c3-0739-4efe-a642-a1426478e5c8" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ViolentPython/__init__.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ViolentPython/portscanner.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/Practice.iml" afterPath="$PROJECT_DIR$/.idea/Practice.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/WebScrapingwithPython/pymysql_savewikidata.py" afterPath="$PROJECT_DIR$/WebScrapingwithPython/pymysql_savewikidata.py" />
+    <list default="true" id="ca67a359-c7bb-4f00-bbb6-802af308a0d7" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/codewars/4kyu_next_bigger.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/codewars/break_caesar.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/codewars/domain_name.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/codewars/find_min_max_product.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/codewars/next_bigger.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/codewars/pig_it.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/testpy/CpuMonitor.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/testpy/__init__.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/web_develop/__init__.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/web_develop/chapter3/__init__.py" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/myFaker/faker_account_data.py" afterPath="$PROJECT_DIR$/myFaker/faker_account_data.py" />
     </list>
-    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
-  </component>
-  <component name="CoverageDataManager">
-    <SUITE FILE_PATH="coverage/Practice$compound_match.coverage" NAME="compound_match Coverage Results" MODIFIED="1525870939946" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/codewars" />
-    <SUITE FILE_PATH="coverage/Practice$added_char.coverage" NAME="added_char Coverage Results" MODIFIED="1525783267790" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/codewars" />
-    <SUITE FILE_PATH="coverage/Practice$thirt.coverage" NAME="thirt Coverage Results" MODIFIED="1525323813723" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/codewars" />
-    <SUITE FILE_PATH="coverage/Practice$coding_with_squared_strings.coverage" NAME="coding_with_squared_strings Coverage Results" MODIFIED="1526642061693" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/codewars" />
-    <SUITE FILE_PATH="coverage/Practice$test.coverage" NAME="test Coverage Results" MODIFIED="1526378700922" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/codewars" />
-    <SUITE FILE_PATH="coverage/Practice$josephus.coverage" NAME="josephus Coverage Results" MODIFIED="1527253401062" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/codewars" />
-    <SUITE FILE_PATH="coverage/Practice$sum_dig_pow.coverage" NAME="sum_dig_pow Coverage Results" MODIFIED="1525409737093" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/codewars" />
-    <SUITE FILE_PATH="coverage/Practice$change.coverage" NAME="change Coverage Results" MODIFIED="1526474596601" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/codewars" />
-    <SUITE FILE_PATH="coverage/Practice$compound_match2.coverage" NAME="compound_match2 Coverage Results" MODIFIED="1525924004363" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/codewars" />
-    <SUITE FILE_PATH="coverage/Practice$faker_account_data.coverage" NAME="faker_account_data Coverage Results" MODIFIED="1527474179423" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/myFaker" />
-    <SUITE FILE_PATH="coverage/Practice$mergedicts.coverage" NAME="mergedicts Coverage Results" MODIFIED="1525776939042" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/codewars" />
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
@@ -133,8 +124,8 @@
       <file leaf-file-name="portscanner.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/ViolentPython/portscanner.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="270">
-              <caret line="31" column="41" lean-forward="true" selection-start-line="31" selection-start-column="41" selection-end-line="31" selection-end-column="41" />
+            <state relative-caret-position="378">
+              <caret line="34" column="3" lean-forward="false" selection-start-line="34" selection-start-column="3" selection-end-line="34" selection-end-column="3" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
               </folding>
@@ -144,59 +135,8 @@
       </file>
     </leaf>
   </component>
-  <component name="FileTemplateManagerImpl">
-    <option name="RECENT_TEMPLATES">
-      <list>
-        <option value="Python Script" />
-      </list>
-    </option>
-  </component>
-  <component name="FindInProjectRecents">
-    <findStrings>
-      <find>prin</find>
-    </findStrings>
-  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
-  </component>
-  <component name="IdeDocumentHistory">
-    <option name="CHANGED_PATHS">
-      <list>
-        <option value="$PROJECT_DIR$/codewars/thirt.py" />
-        <option value="$PROJECT_DIR$/codewars/sum_dig_pow.py" />
-        <option value="$PROJECT_DIR$/codewars/fat_fingers.py" />
-        <option value="$PROJECT_DIR$/codewars/performant_smallest.py" />
-        <option value="$PROJECT_DIR$/codewars/mergedicts.py" />
-        <option value="$PROJECT_DIR$/codewars/added_char.py" />
-        <option value="$PROJECT_DIR$/codewars/compound_match.py" />
-        <option value="$PROJECT_DIR$/codewars/compound_match2.py" />
-        <option value="$PROJECT_DIR$/codewars/sort_by_name.py" />
-        <option value="$PROJECT_DIR$/codewars/test.py" />
-        <option value="$PROJECT_DIR$/codewars/change.py" />
-        <option value="$PROJECT_DIR$/codewars/coding_with_squared_strings.py" />
-        <option value="$PROJECT_DIR$/Quant/test.py" />
-        <option value="$PROJECT_DIR$/myFaker/faker_account_data.py" />
-        <option value="$PROJECT_DIR$/codewars/josephus.py" />
-        <option value="$PROJECT_DIR$/codewars/format_duration.py" />
-        <option value="$PROJECT_DIR$/WebScrapingwithPython/pymysql_savewikidata.py" />
-        <option value="$PROJECT_DIR$/ViolentPython/portscanner.py" />
-      </list>
-    </option>
-  </component>
-  <component name="JsBuildToolGruntFileManager" detection-done="true" sorting="DEFINITION_ORDER" />
-  <component name="JsBuildToolPackageJson" detection-done="true" sorting="DEFINITION_ORDER" />
-  <component name="JsGulpfileManager">
-    <detection-done>true</detection-done>
-    <sorting>DEFINITION_ORDER</sorting>
-  </component>
-  <component name="NodePackageJsonFileManager">
-    <packageJsonPaths />
-  </component>
-  <component name="ProjectFrameBounds">
-    <option name="x" value="-7" />
-    <option name="y" value="58" />
-    <option name="width" value="1936" />
-    <option name="height" value="1056" />
   </component>
   <component name="ProjectView">
     <navigator currentView="ProjectPane" proportions="" version="1">
@@ -221,42 +161,12 @@
               <item name="Practice" type="b2602c69:ProjectViewProjectNode" />
               <item name="Practice" type="462c0819:PsiDirectoryNode" />
             </path>
-            <path>
-              <item name="Practice" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Practice" type="462c0819:PsiDirectoryNode" />
-              <item name="BlackHatPython" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Practice" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Practice" type="462c0819:PsiDirectoryNode" />
-              <item name="myFaker" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Practice" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Practice" type="462c0819:PsiDirectoryNode" />
-              <item name="Quant" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Practice" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Practice" type="462c0819:PsiDirectoryNode" />
-              <item name="ViolentPython" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Practice" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Practice" type="462c0819:PsiDirectoryNode" />
-              <item name="WebScrapingwithPython" type="462c0819:PsiDirectoryNode" />
-            </path>
           </expand>
           <select />
         </subPane>
       </pane>
       <pane id="Scope" />
     </panes>
-  </component>
-  <component name="PropertiesComponent">
-    <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -416,9 +326,6 @@
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
-  </component>
-  <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="1" />
   </component>
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
@@ -854,8 +761,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/ViolentPython/portscanner.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="270">
-          <caret line="31" column="41" lean-forward="true" selection-start-line="31" selection-start-column="41" selection-end-line="31" selection-end-column="41" />
+        <state relative-caret-position="378">
+          <caret line="34" column="3" lean-forward="false" selection-start-line="34" selection-start-column="3" selection-end-line="34" selection-end-column="3" />
           <folding>
             <element signature="e#0#15#0" expanded="true" />
           </folding>
