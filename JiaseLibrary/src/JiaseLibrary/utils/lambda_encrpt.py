@@ -43,4 +43,3 @@ if __name__ == '__main__':
     print(pc._encrypt('GreenPolls测试'))
     print(pc._decrypt('yD/99zCoxXUcbOvIPAR7IA=='))
     #VjlVB1WhVQZOMxXIF+I+TGK4VzqamhonfjsALU4MKNw=
-
