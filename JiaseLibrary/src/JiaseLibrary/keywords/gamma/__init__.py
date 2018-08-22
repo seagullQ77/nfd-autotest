@@ -11,7 +11,10 @@ from faker_nfd import NfdCompanyProvider
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-CONF_PATH = BASE_DIR  + "\\config\\config.cfg"
+CONF_PATH = BASE_DIR + "\\config\\config.cfg"
+print(CONF_PATH)
+#E:/mine_qsg/tech_two-nfd-autotest/nfd-autotest/JiaseLibrary/src/JiaseLibrary/keywords/kappa\config\config.cfg
+
 
 
 class GammaLibrary(_GammaSysAuthKeywords,_GammaQuickLoanKeywords):
@@ -24,10 +27,8 @@ class GammaLibrary(_GammaSysAuthKeywords,_GammaQuickLoanKeywords):
         self.gamma_port = gamma_port
         self._init_request_arg()
         self._get_config()
-        self._init_request_arg()
 
         self._faker   = Factory.create(locale='zh_CN')
-        self._faker.add_provider(NfdCompanyProvider)
 
         #不能用，待查
         # self.faker = Faker("zh_cn")
@@ -53,5 +54,7 @@ if __name__ == '__main__':
 
     jiaseG = GammaLibrary()
     jiaseG.login_gamma(role='gamma_invest_manager')
-    jiaseG.create_quick_cust('test-快捷贷8','15500000008')
+    jiaseG.create_quick_cust('test-快捷贷10','155000000010')
     #jiaseG.logout_gamma()
+
+    #e9104f9404f7d670624b62473fdd47ac3f181d255efb362e11ca1b54f3c19cc1

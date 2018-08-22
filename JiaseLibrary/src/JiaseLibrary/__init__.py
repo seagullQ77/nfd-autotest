@@ -122,24 +122,26 @@ if __name__ == '__main__':
     jiase.login_lambda(role='lambda_invest_manager')
     #jiase.loan_apply_pass_workflow(loan_apply_id= 7, loan_amount=1000)
 
-    cust_personal_id = jiase.custom_personal_create(cust_name='委托geren11')
-   # cust_enterprise_id = jiase.custom_enterprise_create(cust_personal_id, cust_name='委托qiye7')
+    cust_personal_id0 = jiase.custom_personal_create(cust_name='mptest2geren6')
+    cust_enterprise_id1 = jiase.custom_enterprise_create(cust_personal_id0, cust_name='mptest2qiye6')
+
+
 
 
 
     # 生成授信
-    loan_apply_id = jiase.loan_apply_create(cust_personal_id)
+    #loan_apply_id = jiase.loan_apply_create(cust_personal_id)
 
     # 生成授信明细
-    loan_detail_id1 = jiase.loan_apply_prepare_create(loan_apply_id)
-    jiase.loan_detail_self_save(loan_apply_id, loan_detail_id1,'种植贷',self_limit='1000000')
-    jiase.loan_detail_guarantor_save(loan_apply_id, loan_detail_id1,'种植贷',guarantee_limit='50000')
-
-    # 添加担保方
-    jiase.loan_guarantors_create(loan_detail_id1, 440)
-
-    # 投资经理提交授信申请
-    jiase.loan_apply_submit(loan_apply_id) 
+    # loan_detail_id1 = jiase.loan_apply_prepare_create(loan_apply_id)
+    # jiase.loan_detail_self_save(loan_apply_id, loan_detail_id1,'种植贷',self_limit='1000000')
+    # jiase.loan_detail_guarantor_save(loan_apply_id, loan_detail_id1,'种植贷',guarantee_limit='50000')
+    #
+    # # 添加担保方
+    # jiase.loan_guarantors_create(loan_detail_id1, 440)
+    #
+    # # 投资经理提交授信申请
+    # jiase.loan_apply_submit(loan_apply_id)
 
     '''
 

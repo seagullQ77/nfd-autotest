@@ -41,6 +41,6 @@ class LambdaEncrpt():
 if __name__ == '__main__':
     pc = LambdaEncrpt('lambda_test')
     print(pc._encrypt('GreenPolls测试'))
-    print(pc._decrypt('VjlVB1WhVQZOMxXIF+I+TGK4VzqamhonfjsALU4MKNw='))
+    print(pc._decrypt('yD/99zCoxXUcbOvIPAR7IA=='))
     #VjlVB1WhVQZOMxXIF+I+TGK4VzqamhonfjsALU4MKNw=
 

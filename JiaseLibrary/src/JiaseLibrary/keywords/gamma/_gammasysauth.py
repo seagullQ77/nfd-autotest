@@ -21,10 +21,11 @@ class _GammaSysAuthKeywords():
         if psd is None:
             psd = self._gamma_all_psd
         psd = hashlib.sha256(psd.encode()).hexdigest()
+        print(psd)
 
         url = '%s/gamma/auth/login' %self._gamma_url
         payload = {
-            "username":usr,
+            "username":'e9104f9404f7d670624b62473fdd47ac3f181d255efb362e11ca1b54f3c19cc1',
             "password":psd
         }
         res = self._request.post(url=url,headers = self._headers,data = json.dumps(payload))

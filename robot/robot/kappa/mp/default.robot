@@ -5,17 +5,17 @@ Resource        ../../lib/lambda/lambda.robot
 Suite Setup     生成随机用户信息
 
 *** Variables ***
-${KAPPA_MP_BACKEND_HOST}               kappa-backend-mp-prd.ronaldinho.svc.cluster.local
-${KAPPA_MP_BACKEND_PORT}               8011
-${LAMBDA_SERVER_HOST}                   lambda-server-prd.ronaldinho.svc.cluster.local
+${KAPPA_MP_BACKEND_HOST}                10.1.60.114
+${KAPPA_MP_BACKEND_PORT}                8081
+${LAMBDA_SERVER_HOST}                   10.1.60.114
 ${LAMBDA_SERVER_PORT}                   8080
-${LAMBDA_DB_HOST}                       lambda-db-prd.ronaldinho.svc.cluster.local
+${LAMBDA_DB_HOST}                       10.1.60.114
 ${MESSAGE}       Hello, world!
 
 ${INVEST_MANAGER_USER}     18697989859
 ${INVEST_MANAGER_NAME}     胡云祥
-${uid}       13270254558
-${uname}     展英松
+${uid}       18700000004
+${uname}     展期geren54
 *** Test Cases ***
 用户注册
    用户注册

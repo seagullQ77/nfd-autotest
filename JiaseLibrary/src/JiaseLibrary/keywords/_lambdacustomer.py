@@ -160,7 +160,8 @@ class _LambdaCustomerKeywords():
             cust_name = self._faker.name_wuxia() + '企业'
         if not id_code:
             id_code = ''.join([random.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789') for _ in range(18)])
-        id_type = random.choice(['QY_XYDM','QY_YYZZH'])
+        #id_type = random.choice(['QY_XYDM', 'QY_YYZZH'])
+        id_type = random.choice(['QY_XYDM'])
 
         cust_list = []
         if cust_kind is None:
@@ -195,6 +196,7 @@ class _LambdaCustomerKeywords():
             self.cust_business_create(cust_id)
             self.cust_bank_accounts_create(cust_id)
             self.custom_update_db(cust_id,'QY')
+            self.cust_income_create(cust_id, cust_name)
             return cust_id
         else:
             raise AssertionError('新增企业客户失败:错误码:%s,错误信息:%s' % (ret.get('statusCode'), ret.get('statusDesc')))
