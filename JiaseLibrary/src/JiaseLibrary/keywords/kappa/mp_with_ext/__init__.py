@@ -28,22 +28,21 @@ class KappaMpLibrary(
     ROBOT_SUPPRESS_NAME = False
     ROBOT_EXIT_ON_FAILURE = True
 
-    def __init__(self, host=None, port=None ,source = None):
+    def __init__(self, host=None, port=None):
         self._host = host
         self._port = port
         self._faker = Factory.create(locale='zh_CN')
-        self._get_config(source)
+        self._get_config()
 
-    def _get_config(self,source = None):
+    def _get_config(self):
 
         cf = configparser.ConfigParser()
         cf.read(CONF_PATH, encoding='utf-8')
-        if source == 'ext':
-            self._kappa_mp_ext_host = self._host or cf.get('kappa_mp_ext', 'kappa_mp_ext_host')
-            self._kappa_mp_ext_port = self._port or cf.get('kappa_mp_ext', 'kappa_mp_ext_port')
-        else:
-            self._kappa_mp_host = self._host or cf.get('kappa_mp', 'kappa_mp_host')
-            self._kappa_mp_port = self._port or cf.get('kappa_mp', 'kappa_mp_port')
+        self._kappa_mp_host = self._host or cf.get('kappa_mp', 'kappa_mp_host')
+        self._kappa_mp_port = self._port or cf.get('kappa_mp', 'kappa_mp_port')
+
+        self._kappa_mp_ext_host = self._host or cf.get('kappa_mp_ext', 'kappa_mp_ext_host')
+        self._kappa_mp_ext_port = self._port or cf.get('kappa_mp_ext', 'kappa_mp_ext_port')
 
         self.interface_url = "http://%s" % (self._kappa_mp_host)
         print(self.interface_url)
@@ -56,7 +55,7 @@ class KappaMpLibrary(
 
 
 if __name__ == '__main__':
-     jiaseMP = KappaMpLibrary(source='ext')
+     jiaseMP = KappaMpLibrary()
      jiaseMP.login_with_sms(18777777777,150315)
      jiaseMP.submit_register(18777777777)
      jiaseMP.create_funds_account_GR(mobile=18777777777,userRole = "GUARANTEECORP")
